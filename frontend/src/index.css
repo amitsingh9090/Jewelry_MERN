@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Inter:wght@100;200;300;400;500;600&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-gold-50: #fbf9f4;
+  --color-gold-100: #f3edd7;
+  --color-gold-200: #e4d7a8;
+  --color-gold-300: #d4bf74;
+  --color-gold-400: #c7a84b;
+  --color-gold-500: #b89130;
+  --color-gold-600: #9e7525;
+  --color-gold-700: #815b1f;
+  --color-gold-800: #69481c;
+  --color-gold-900: #573a1a;
+  --color-gold-950: #311f0c;
+
+  --color-luxury-black: #070708;
+  --color-luxury-dark: #0f0f11;
+  --color-luxury-charcoal: #17171b;
+  --color-luxury-gold: #c5a880; /* Elegant champagne gold */
+  --color-luxury-silver: #f1f5f9;
+
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+/* Custom Base Styles */
+@layer base {
+  body {
+    @apply bg-luxury-black text-slate-300 font-sans antialiased selection:bg-gold-500/20 selection:text-gold-100 tracking-wide;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif tracking-[0.05em] text-white;
+  }
+}
+
+/* Luxury Glassmorphism Utilities */
+.glass-panel {
+  background: rgba(15, 15, 17, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(197, 168, 128, 0.12);
+}
+
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, #f3edd7 0%, #c5a880 50%, #b89130 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-gradient-bg {
+  background: linear-gradient(135deg, #f3edd7 0%, #c5a880 50%, #9e7525 100%);
+}
+
+.gold-border-glow:hover {
+  box-shadow: 0 0 25px rgba(197, 168, 128, 0.2);
+  border-color: rgba(197, 168, 128, 0.4);
+  transition: all 0.4s ease-in-out;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #070708;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(197, 168, 128, 0.2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(197, 168, 128, 0.4);
+}
+
+/* Cinematic Slow Zoom for Hero Images */
+@keyframes kenburns {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.08) translate(-1%, -0.5%);
+  }
+  100% {
+    transform: scale(1) translate(0, 0);
+  }
+}
+
+.animate-kenburns {
+  animation: kenburns 20s infinite ease-in-out;
+}
+
+/* Fade in up custom transition */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
