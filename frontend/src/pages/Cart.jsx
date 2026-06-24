@@ -1,32 +1,13 @@
 import React from 'react';
 import { useLuxe } from '../context/LuxeContext.jsx';
 import { Link, useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
 
 function Cart() {
-  const { cart, removeFromCart, updateCartQty, toggleWishlist, user } = useLuxe();
+  const { cart, removeFromCart, updateCartQty, toggleWishlist } = useLuxe();
   const navigate = useNavigate();
 
   const handleCheckout = () => {
-    if (cart.length === 0) {
-      toast.error('Your cart is empty.');
-      return;
-    }
-    
-    // Auth Check
-    if (!user) {
-      toast.error('Authentication Required! Please register or log in to reserve luxury rentals.', {
-        duration: 4000,
-        style: {
-          background: '#111113',
-          color: '#cca26a',
-          border: '1px solid rgba(204, 162, 106, 0.3)'
-        }
-      });
-      navigate('/login');
-      return;
-    }
-
+    if (cart.length === 0) return alert('Your cart is currently empty.');
     navigate('/checkout');
   };
 
@@ -88,7 +69,7 @@ function Cart() {
                     </div>
 
                     <div className="flex gap-2">
-                      <button onClick={() => { toggleWishlist(item.product.id); removeFromCart(item.product.id); }} className="text-xs text-gold-500 hover:text-gold-300" title="Move to Wishlist">❤️</button>
+                      <button onClick={() => { toggleWishlist(item.product.id); removeFromCart(item.product.id); alert('Moved to wishlist!'); }} className="text-xs text-gold-500 hover:text-gold-300" title="Move to Wishlist">❤️</button>
                       <button onClick={() => removeFromCart(item.product.id)} className="text-xs text-rose-500 hover:text-rose-400" title="Remove">🗑️</button>
                     </div>
                   </div>
@@ -99,13 +80,6 @@ function Cart() {
 
           <div className="lg:col-span-4 glass-panel p-6 rounded-xl border border-gold-500/20 space-y-6">
             <h2 className="text-xl font-serif text-white border-b border-slate-900 pb-3">Rental Summary</h2>
-            
-            {!user && (
-              <div className="p-3 bg-gold-950/20 border border-gold-500/10 text-[11px] text-luxury-gold rounded leading-relaxed">
-                📢 You are currently browsing as a guest. You will need to log in or register before checking out.
-              </div>
-            )}
-
             <div className="space-y-3 text-xs text-slate-400">
               <div className="flex justify-between"><span>Rental Subtotal</span><span className="text-white">${totals.rent}</span></div>
               <div className="flex justify-between"><span>Security Deposit (Refundable)</span><span className="text-white">${totals.deposit}</span></div>

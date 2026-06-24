@@ -1,41 +1,14 @@
 import React, { useState } from 'react';
 import { useLuxe } from '../context/LuxeContext.jsx';
-import { useNavigate, Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 function Checkout() {
-  const { cart, placeOrder, user } = useLuxe();
+  const { cart, placeOrder } = useLuxe();
   const navigate = useNavigate();
 
-  const [name, setName] = useState(user ? user.name : '');
-  const [address, setAddress] = useState(user ? user.address : '');
+  const [name, setName] = useState('');
+  const [address, setAddress] = useState('');
   const [card, setCard] = useState('');
-
-  // If user is not logged in, block page viewing
-  if (!user) {
-    return (
-      <div className="max-w-md mx-auto px-6 py-20 text-center space-y-6 min-h-[60vh] flex flex-col justify-center items-center">
-        <div className="space-y-2">
-          <span className="text-xs tracking-[0.3em] text-rose-500 uppercase font-semibold">ACCESS RESTRICTED</span>
-          <h1 className="text-3xl font-serif text-white">Authentication Required</h1>
-          <div className="w-12 h-[1px] bg-rose-500 mx-auto mt-2" />
-        </div>
-        
-        <p className="text-slate-400 text-sm max-w-sm font-light leading-relaxed">
-          You must have an active client account to access the secure reservation checkout. Please log in or sign up.
-        </p>
-
-        <div className="pt-4 flex gap-4">
-          <Link to="/login" className="px-6 py-2.5 gold-gradient-bg text-luxury-black text-xs font-semibold uppercase tracking-widest rounded transition-opacity hover:opacity-90">
-            Login
-          </Link>
-          <Link to="/register" className="px-6 py-2.5 border border-gold-500/30 text-gold-300 text-xs font-semibold uppercase tracking-widest rounded hover:bg-gold-500/10">
-            Register
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   const totals = cart.reduce((acc, item) => {
     const start = new Date(item.startDate);
@@ -51,12 +24,10 @@ function Checkout() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name || !address || !card) {
-      toast.error('Please complete all billing fields.');
-      return;
-    }
+    if (!name || !address || !card) return alert('Please complete all billing fields.');
     const orderId = placeOrder(grandTotal);
-    navigate('/login'); // Redirect to dashboard to see active bookings
+    alert(`Order ${orderId} Placed Successfully!`);
+    navigate('/login'); // Sends to login dashboard
   };
 
   return (

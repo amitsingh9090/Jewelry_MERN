@@ -1,45 +1,23 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLuxe } from '../context/LuxeContext.jsx';
 import { Link } from 'react-router-dom';
 
-function Festivals() {
+function MehndiCollection() {
   const { products, addToCart, toggleWishlist, wishlist } = useLuxe();
-  const [selectedFestival, setSelectedFestival] = useState('All');
 
-  const festivalsList = ['All', 'Diwali Sparkle', 'Eid Opulence', 'Navratri Heritage'];
-
-  const filtered = products.filter(prod => {
-    if (!prod.festivals) return false;
-    return selectedFestival === 'All' || prod.festivals.includes(selectedFestival);
-  });
+  const filtered = products.filter(prod => prod.occasions && prod.occasions.includes("Mehndi Traditions"));
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
       <div className="text-center mb-12 space-y-2">
-        <span className="text-xs tracking-[0.3em] text-luxury-gold uppercase font-semibold">CELEBRATIONAL ORNAMENTS</span>
-        <h1 className="text-4xl md:text-5xl font-serif text-white">Festival Collections</h1>
+        <span className="text-xs tracking-[0.3em] text-luxury-gold uppercase font-semibold">WEDDING OCCASIONS</span>
+        <h1 className="text-4xl md:text-5xl font-serif text-white">undefined</h1>
         <div className="w-12 h-[1px] bg-luxury-gold mx-auto mt-2" />
-        <p className="text-slate-400 text-sm max-w-lg mx-auto font-light pt-2">Dazzle in gold and diamond sets tailored specifically for ethnic celebrations.</p>
-      </div>
-
-      <div className="flex justify-center gap-2 mb-8">
-        {festivalsList.map((fest) => (
-          <button
-            key={fest}
-            onClick={() => setSelectedFestival(fest)}
-            className={`px-4 py-2 text-xs tracking-widest uppercase rounded border transition-all ${
-              selectedFestival === fest
-                ? 'bg-luxury-gold text-luxury-black border-luxury-gold font-semibold'
-                : 'border-slate-800 text-slate-400 hover:border-gold-500/30'
-            }`}
-          >
-            {fest}
-          </button>
-        ))}
+        <p className="text-slate-400 text-sm max-w-lg mx-auto font-light pt-2">Charming meenakari, pearl, and gemstone creations designed for lively Mehndi events.</p>
       </div>
 
       {filtered.length === 0 ? (
-        <div className="text-center text-slate-500 py-16">No items matching this festival selection.</div>
+        <div className="text-center text-slate-500 py-16">No items currently active in this wedding catalog segment.</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {filtered.map((prod) => {
@@ -82,4 +60,4 @@ function Festivals() {
   );
 }
 
-export default Festivals;
+export default MehndiCollection;
