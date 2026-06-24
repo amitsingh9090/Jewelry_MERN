@@ -6,22 +6,29 @@ const slugify = (text) => text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\
 
 function Header() {
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { cart, categories, occasions, cultures, festivals } = useLuxe();
   const navigate = useNavigate();
 
   return (
     <header className="sticky top-0 z-50 glass-panel border-b border-gold-500/10 text-slate-100">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        {/* Back Button & Brand Logo */}
-        <div className="flex items-center gap-4">
+        {/* Mobile/Tablet Menu Button & Brand Logo */}
+        <div className="flex items-center gap-3">
           <button 
-            onClick={() => navigate(-1)} 
-            className="text-slate-300 bg-slate-900/40 border border-gold-500/10 backdrop-blur-md p-2 rounded-full shadow-lg hover:text-luxury-gold hover:border-gold-500/30 hover:scale-105 hover:bg-slate-900/60 active:scale-95 transition-all duration-300 focus:outline-none flex items-center justify-center cursor-pointer"
-            title="Go Back"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
+            className="lg:hidden text-slate-300 bg-slate-900/40 border border-gold-500/10 backdrop-blur-md p-2 rounded-full shadow-lg hover:text-luxury-gold hover:border-gold-500/30 transition-all duration-300 focus:outline-none flex items-center justify-center cursor-pointer"
+            title="Toggle Menu"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-            </svg>
+            {mobileMenuOpen ? (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
           </button>
 
           <Link to="/" className="flex flex-col items-center select-none group">
@@ -149,6 +156,54 @@ function Header() {
           </Link>
         </div>
       </div>
+
+      {/* Mobile/Tablet Menu Dropdown */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden absolute top-full left-0 w-full bg-luxury-black/95 border-b border-gold-500/10 p-6 shadow-2xl backdrop-blur-md z-40 max-h-[85vh] overflow-y-auto space-y-6">
+          <div className="flex flex-col gap-4 text-xs tracking-[0.25em] font-light text-slate-300">
+            <Link to="/" onClick={() => setMobileMenuOpen(false)} className="hover:text-luxury-gold transition-colors py-1.5 border-b border-slate-900">HOME</Link>
+            <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="hover:text-luxury-gold transition-colors py-1.5 border-b border-slate-900">ABOUT</Link>
+            
+            {/* Collections Section */}
+            <div className="space-y-2 py-1.5 border-b border-slate-900">
+              <span className="text-[10px] text-luxury-gold uppercase tracking-[0.2em] font-bold block mb-1">COLLECTIONS</span>
+              <Link to="/collections" onClick={() => setMobileMenuOpen(false)} className="block pl-4 text-[11px] text-slate-300 hover:text-luxury-gold transition-colors py-1">ALL COLLECTIONS</Link>
+              {categories.map((cat) => (
+                <Link key={cat} to={`/collections/${slugify(cat)}`} onClick={() => setMobileMenuOpen(false)} className="block pl-4 text-[11px] text-slate-400 hover:text-luxury-gold transition-colors py-1 uppercase">{cat}</Link>
+              ))}
+            </div>
+
+            {/* Wedding Vault Section */}
+            <div className="space-y-2 py-1.5 border-b border-slate-900">
+              <span className="text-[10px] text-luxury-gold uppercase tracking-[0.2em] font-bold block mb-1">WEDDING VAULT</span>
+              <Link to="/wedding" onClick={() => setMobileMenuOpen(false)} className="block pl-4 text-[11px] text-slate-300 hover:text-luxury-gold transition-colors py-1">ALL WEDDING JEWELRY</Link>
+              {occasions.map((occ) => (
+                <Link key={occ} to={`/wedding/${slugify(occ)}`} onClick={() => setMobileMenuOpen(false)} className="block pl-4 text-[11px] text-slate-400 hover:text-luxury-gold transition-colors py-1 uppercase">{occ}</Link>
+              ))}
+            </div>
+
+            {/* Cultures Section */}
+            <div className="space-y-2 py-1.5 border-b border-slate-900">
+              <span className="text-[10px] text-luxury-gold uppercase tracking-[0.2em] font-bold block mb-1">CULTURES</span>
+              <Link to="/cultural" onClick={() => setMobileMenuOpen(false)} className="block pl-4 text-[11px] text-slate-300 hover:text-luxury-gold transition-colors py-1">ALL CULTURAL</Link>
+              {cultures.map((cult) => (
+                <Link key={cult} to={`/cultural/${slugify(cult)}`} onClick={() => setMobileMenuOpen(false)} className="block pl-4 text-[11px] text-slate-400 hover:text-luxury-gold transition-colors py-1 uppercase">{cult}</Link>
+              ))}
+            </div>
+
+            {/* Festivals Section */}
+            <div className="space-y-2 py-1.5 border-b border-slate-900">
+              <span className="text-[10px] text-luxury-gold uppercase tracking-[0.2em] font-bold block mb-1">FESTIVALS</span>
+              <Link to="/festivals" onClick={() => setMobileMenuOpen(false)} className="block pl-4 text-[11px] text-slate-300 hover:text-luxury-gold transition-colors py-1">ALL FESTIVALS</Link>
+              {festivals.map((fest) => (
+                <Link key={fest} to={`/festivals/${slugify(fest)}`} onClick={() => setMobileMenuOpen(false)} className="block pl-4 text-[11px] text-slate-400 hover:text-luxury-gold transition-colors py-1 uppercase">{fest}</Link>
+              ))}
+            </div>
+
+            <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="hover:text-luxury-gold transition-colors py-1.5">CONTACT</Link>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
