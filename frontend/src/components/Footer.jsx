@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 function Footer() {
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert('Thank you for subscribing to Valentina Luxe newsletter!');
+    alert('Thank you for subscribing to Trinkets newsletter!');
   };
 
   return (
@@ -15,10 +15,10 @@ function Footer() {
         <div className="space-y-4">
           <Link to="/" className="flex flex-col select-none">
             <span className="text-xl font-serif tracking-[0.2em] text-white font-bold">
-              VALENTINA
+              TRINKETS
             </span>
-            <span className="text-[8px] tracking-[0.4em] text-luxury-gold uppercase font-light -mt-0.5">
-              Luxe Vault
+            <span className="text-[8px] tracking-[0.25em] text-luxury-gold uppercase font-light -mt-0.5">
+              Jewelry Rental Store
             </span>
           </Link>
           <p className="text-xs text-slate-500 font-light leading-relaxed">
@@ -76,7 +76,7 @@ function Footer() {
       </div>
 
       <div className="border-t border-slate-900 py-6 text-center text-[10px] text-slate-600 tracking-wider">
-        <p>© 2026 VALENTINA LUXE. Powered by React 19 & Express. Created under Gemini Antigravity.</p>
+        <p>© 2026 TRINKETS (Jewelry Rental Store). Powered by React 19 & Express. Created under Gemini Antigravity.</p>
       </div>
     </footer>
   );

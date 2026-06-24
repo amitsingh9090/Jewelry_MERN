@@ -31,7 +31,7 @@ function Collections() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
       <div className="text-center mb-12 space-y-2">
-        <span className="text-xs tracking-[0.3em] text-luxury-gold uppercase font-semibold">VALENTINA VAULT</span>
+        <span className="text-xs tracking-[0.3em] text-luxury-gold uppercase font-semibold">TRINKETS VAULT</span>
         <h1 className="text-4xl md:text-5xl font-serif text-white">
           {selectedCategory === 'All' ? 'The Prestige Collections' : selectedCategory}
         </h1>

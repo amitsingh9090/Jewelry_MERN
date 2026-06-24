@@ -12,7 +12,7 @@ function PrivacyPolicy() {
 
       <div className="glass-panel p-8 rounded-2xl border border-slate-800 space-y-6 text-sm text-slate-300 font-light leading-relaxed">
         <p>
-          At Valentina Luxe, we recognize that privacy is of paramount importance to our distinguished patrons. This policy outlines how we handle, protect, and process your personal and transaction data.
+          At Trinkets, we recognize that privacy is of paramount importance to our distinguished patrons. This policy outlines how we handle, protect, and process your personal and transaction data.
         </p>
 
         <h3 className="text-base font-serif text-white font-semibold">1. Collection of Personal Information</h3>
@@ -22,7 +22,7 @@ function PrivacyPolicy() {
 
         <h3 className="text-base font-serif text-white font-semibold">2. Transactional & Payment Security</h3>
         <p>
-          All credit card transactions, billing data, and security deposits are processed through PCI-DSS compliant payment gateways. Valentina Luxe does not store raw credit card details on our local servers.
+          All credit card transactions, billing data, and security deposits are processed through PCI-DSS compliant payment gateways. Trinkets does not store raw credit card details on our local servers.
         </p>
 
         <h3 className="text-base font-serif text-white font-semibold">3. Insured Delivery Data</h3>

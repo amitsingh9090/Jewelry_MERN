@@ -5,7 +5,7 @@ function NotFound() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-20 text-center space-y-6 min-h-[60vh] flex flex-col justify-center items-center">
       <div className="space-y-2">
-        <span className="text-xs tracking-[0.3em] text-luxury-gold uppercase font-semibold">VALENTINA LUXE</span>
+        <span className="text-xs tracking-[0.3em] text-luxury-gold uppercase font-semibold">TRINKETS</span>
         <h1 className="text-3xl md:text-5xl font-serif text-white font-medium">Vault Piece Not Found (404)</h1>
         <div className="w-12 h-[1px] bg-luxury-gold mx-auto mt-2" />
       </div>

@@ -12,7 +12,7 @@ function TermsConditions() {
 
       <div className="glass-panel p-8 rounded-2xl border border-slate-800 space-y-6 text-sm text-slate-300 font-light leading-relaxed">
         <p>
-          Welcome to Valentina Luxe. By renting our premium jewelry, you agree to comply with the terms of custody and return outlined in this agreement.
+          Welcome to Trinkets. By renting our premium jewelry, you agree to comply with the terms of custody and return outlined in this agreement.
         </p>
 
         <h3 className="text-base font-serif text-white font-semibold">1. Security Deposits & Verification</h3>

@@ -15,10 +15,10 @@ function Header() {
         {/* Brand Logo */}
         <Link to="/" className="flex flex-col items-center select-none group">
           <span className="text-2xl md:text-3xl font-serif tracking-[0.2em] text-white font-bold group-hover:text-luxury-gold transition-colors duration-300">
-            VALENTINA
+            TRINKETS
           </span>
-          <span className="text-[9px] tracking-[0.4em] text-luxury-gold uppercase font-light -mt-1">
-            Luxe Vault
+          <span className="text-[8px] tracking-[0.25em] text-luxury-gold uppercase font-light -mt-0.5">
+            Jewelry Rental Store
           </span>
         </Link>
 

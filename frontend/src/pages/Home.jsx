@@ -291,7 +291,7 @@ function Home() {
 
       {/* Instagram Gallery Mockup */}
       <section className="max-w-7xl mx-auto px-6 py-20">
-        <h3 className="text-center font-serif text-lg text-white mb-8 tracking-widest uppercase">SHARE YOUR VAULT LOOKS #VALENTINALUXE</h3>
+        <h3 className="text-center font-serif text-lg text-white mb-8 tracking-widest uppercase">SHARE YOUR VAULT LOOKS #TRINKETS</h3>
         <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
           {VAULT_LOOKS.map((look) => (
             <div 

@@ -7,7 +7,7 @@ function About() {
       {/* Hero Header */}
       <div className="text-center space-y-3">
         <span className="text-xs tracking-[0.3em] text-luxury-gold uppercase font-semibold">OUR HERITAGE & ARTISTRY</span>
-        <h1 className="text-4xl md:text-6xl font-serif text-white font-medium">Valentina Luxe Vault</h1>
+        <h1 className="text-4xl md:text-6xl font-serif text-white font-medium">Trinkets Vault</h1>
         <div className="w-16 h-[1px] bg-luxury-gold mx-auto mt-4" />
         <p className="text-slate-400 text-sm max-w-xl mx-auto font-light leading-relaxed pt-2">
           Crafting exceptional rental experiences for patrons of fine jewelry across generations.
@@ -19,7 +19,7 @@ function About() {
         <div className="space-y-6">
           <h2 className="text-2xl md:text-3xl font-serif text-white">Legacy of Excellence</h2>
           <p className="text-slate-300 text-sm font-light leading-relaxed">
-            Founded with a vision to democratize the luxury of high-fine jewelry, Valentina Luxe offers temporary custody of the world's most exquisite necklaces, tiaras, and heritage gold collections.
+            Founded with a vision to democratize the luxury of high-fine jewelry, Trinkets offers temporary custody of the world's most exquisite necklaces, tiaras, and heritage gold collections.
           </p>
           <p className="text-slate-400 text-sm font-light leading-relaxed">
             Every piece in our vault is curated by our head gemologists and secured under maximum-grade insurance policies, ensuring that you can adorn royal masterworks with absolute confidence and ease.
@@ -61,7 +61,7 @@ function About() {
 
       {/* Return to Action */}
       <div className="text-center pt-8 space-y-4">
-        <h3 className="font-serif text-xl text-white">Ready to experience the Valentina standard?</h3>
+        <h3 className="font-serif text-xl text-white">Ready to experience the Trinkets standard?</h3>
         <div className="flex justify-center gap-4">
           <Link to="/collections" className="px-6 py-3 bg-gold-500 text-luxury-black text-xs font-semibold uppercase tracking-widest rounded hover:opacity-90 transition-opacity">
             Explore Vault
