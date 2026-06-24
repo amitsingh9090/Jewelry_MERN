@@ -350,6 +350,33 @@ export function LuxeProvider({ children }) {
     const saved = localStorage.getItem('luxe_user');
     return saved ? JSON.parse(saved) : null;
   });
+  const [users, setUsers] = useState(() => {
+    const saved = localStorage.getItem('luxe_users');
+    return saved ? JSON.parse(saved) : [
+      {
+        email: 'aria@sterling.com',
+        name: 'Aria Sterling',
+        phone: '+1 (555) 902-8822',
+        address: '742 Park Avenue, New York, NY 10021',
+        password: 'password123',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150',
+        hasAdminAccess: false
+      },
+      {
+        email: 'amit@example.com',
+        name: 'Amit Singh',
+        phone: '+91 9999999999',
+        address: 'New Delhi, India',
+        password: 'password123',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150',
+        hasAdminAccess: true
+      }
+    ];
+  });
+  const [adminCredentials, setAdminCredentials] = useState(() => {
+    const saved = localStorage.getItem('luxe_admin_credentials');
+    return saved ? JSON.parse(saved) : { username: 'amit9115', password: '12345' };
+  });
   const [orders, setOrders] = useState(() => {
     const saved = localStorage.getItem('luxe_orders');
     return saved ? JSON.parse(saved) : [
@@ -409,6 +436,14 @@ export function LuxeProvider({ children }) {
   }, [user]);
 
   useEffect(() => {
+    localStorage.setItem('luxe_users', JSON.stringify(users));
+  }, [users]);
+
+  useEffect(() => {
+    localStorage.setItem('luxe_admin_credentials', JSON.stringify(adminCredentials));
+  }, [adminCredentials]);
+
+  useEffect(() => {
     localStorage.setItem('luxe_orders', JSON.stringify(orders));
   }, [orders]);
 
@@ -450,6 +485,57 @@ export function LuxeProvider({ children }) {
       o.id === orderId ? { ...o, status } : o
     ));
     toast.success(`Order ${orderId} updated to: ${status}`);
+  };
+
+  // Product Edit
+  const updateProduct = (id, updatedFields) => {
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, ...updatedFields } : p));
+    toast.success('Product details updated successfully.');
+  };
+
+  // User Profile edit
+  const updateUserProfile = (email, updatedFields) => {
+    setUsers(prev => prev.map(u => u.email.toLowerCase() === email.toLowerCase() ? { ...u, ...updatedFields } : u));
+    setUser(prev => prev && prev.email.toLowerCase() === email.toLowerCase() ? { ...prev, ...updatedFields } : prev);
+    toast.success('Your profile details have been saved.');
+  };
+
+  // Admin control access
+  const toggleAdminAccess = (email) => {
+    setUsers(prev => prev.map(u => {
+      if (u.email.toLowerCase() === email.toLowerCase()) {
+        const nextVal = !u.hasAdminAccess;
+        toast.success(`Access ${nextVal ? 'granted' : 'revoked'} for ${u.name}`);
+        return { ...u, hasAdminAccess: nextVal };
+      }
+      return u;
+    }));
+  };
+
+  const updateAdminCredentials = (username, password) => {
+    setAdminCredentials({ username, password });
+    toast.success('Admin credentials updated.');
+  };
+
+  // CMS delete helpers
+  const deleteCategory = (name) => {
+    setCategories(prev => prev.filter(c => c !== name));
+    toast.error(`Category ${name} deleted.`);
+  };
+
+  const deleteFestival = (name) => {
+    setFestivals(prev => prev.filter(f => f !== name));
+    toast.error(`Festival tag ${name} deleted.`);
+  };
+
+  const deleteCulture = (name) => {
+    setCultures(prev => prev.filter(c => c !== name));
+    toast.error(`Culture config ${name} deleted.`);
+  };
+
+  const deleteOccasion = (name) => {
+    setOccasions(prev => prev.filter(o => o !== name));
+    toast.error(`Occasion ${name} deleted.`);
   };
 
   // CMS CRUD
@@ -531,29 +617,38 @@ export function LuxeProvider({ children }) {
 
   // Auth operations
   const login = (email, password) => {
-    const name = email.split('@')[0];
-    const mockUser = {
-      email,
-      name: name.charAt(0).toUpperCase() + name.slice(1),
-      phone: '+1 (555) 902-8822',
-      address: '742 Park Avenue, New York, NY 10021',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150'
-    };
-    setUser(mockUser);
-    toast.success(`Welcome back, ${mockUser.name}!`);
+    const found = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    if (!found) {
+      toast.error('User profile not found. Please register.');
+      return false;
+    }
+    if (found.password !== password) {
+      toast.error('Incorrect password.');
+      return false;
+    }
+    setUser(found);
+    toast.success(`Welcome back, ${found.name}!`);
     return true;
   };
 
   const register = (name, email, password) => {
-    const mockUser = {
-      email,
+    const exists = users.some(u => u.email.toLowerCase() === email.toLowerCase());
+    if (exists) {
+      toast.error('User already exists with this email.');
+      return false;
+    }
+    const newUser = {
       name,
-      phone: '+1 (555) 123-4567',
+      email,
+      password,
+      phone: 'Please set your phone number',
       address: 'Please set your shipping address',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150'
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150',
+      hasAdminAccess: false
     };
-    setUser(mockUser);
-    toast.success(`Profile registered. Welcome!`);
+    setUsers(prev => [...prev, newUser]);
+    setUser(newUser);
+    toast.success(`Account registered successfully. Welcome!`);
     return true;
   };
 
@@ -620,6 +715,8 @@ export function LuxeProvider({ children }) {
       cart,
       wishlist,
       user,
+      users,
+      adminCredentials,
       orders,
       tickets,
       categories,
@@ -627,12 +724,20 @@ export function LuxeProvider({ children }) {
       cultures,
       occasions,
       addProduct,
+      updateProduct,
       deleteProduct,
       updateOrderStatus,
+      updateUserProfile,
+      toggleAdminAccess,
+      updateAdminCredentials,
       addCategory,
+      deleteCategory,
       addFestival,
+      deleteFestival,
       addCulture,
+      deleteCulture,
       addOccasion,
+      deleteOccasion,
       addToCart,
       removeFromCart,
       updateCartQty,

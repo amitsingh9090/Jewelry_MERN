@@ -280,7 +280,7 @@ function Home() {
         <div className="max-w-4xl mx-auto px-6 text-center space-y-8">
           <span className="text-xs tracking-[0.3em] text-luxury-gold uppercase">PATRON REVIEWS</span>
           <div className="text-xl md:text-2xl font-serif text-slate-300 italic leading-relaxed">
-            "Valentina Luxe was absolutely magical. I rented the Imperial Emerald Necklace for my reception ceremony, and it stole the night. The delivery was perfectly secure, and returning was seamless."
+            "Trinkets was absolutely magical. I rented the Imperial Emerald Necklace for my reception ceremony, and it stole the night. The delivery was perfectly secure, and returning was seamless."
           </div>
           <div className="space-y-1">
             <h4 className="text-white text-sm font-serif font-bold">Lady Isabella Sterling</h4>

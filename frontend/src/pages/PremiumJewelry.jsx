@@ -10,7 +10,7 @@ function PremiumJewelry() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
       <div className="text-center mb-12 space-y-2">
-        <span className="text-xs tracking-[0.3em] text-luxury-gold uppercase font-semibold">VALENTINA CATEGORIES</span>
+        <span className="text-xs tracking-[0.3em] text-luxury-gold uppercase font-semibold">TRINKETS CATEGORIES</span>
         <h1 className="text-4xl md:text-5xl font-serif text-white">Premium Diamond & Emerald Vault</h1>
         <div className="w-12 h-[1px] bg-luxury-gold mx-auto mt-2" />
         <p className="text-slate-400 text-sm max-w-lg mx-auto font-light pt-2">The absolute pinnacle of luxury jewelry rentals. Wear diamonds and pristine gemstones.</p>
