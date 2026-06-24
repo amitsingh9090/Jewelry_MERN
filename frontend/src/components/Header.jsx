@@ -12,15 +12,27 @@ function Header() {
   return (
     <header className="sticky top-0 z-50 glass-panel border-b border-gold-500/10 text-slate-100">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        {/* Brand Logo */}
-        <Link to="/" className="flex flex-col items-center select-none group">
-          <span className="text-2xl md:text-3xl font-serif tracking-[0.2em] text-white font-bold group-hover:text-luxury-gold transition-colors duration-300">
-            TRINKETS
-          </span>
-          <span className="text-[8px] tracking-[0.25em] text-luxury-gold uppercase font-light -mt-0.5">
-            Jewelry Rental Store
-          </span>
-        </Link>
+        {/* Back Button & Brand Logo */}
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => navigate(-1)} 
+            className="hover:text-luxury-gold text-slate-400 hover:bg-slate-900/60 p-2 rounded-full transition-all focus:outline-none flex items-center justify-center cursor-pointer"
+            title="Go Back"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+          </button>
+
+          <Link to="/" className="flex flex-col items-center select-none group">
+            <span className="text-2xl md:text-3xl font-serif tracking-[0.2em] text-white font-bold group-hover:text-luxury-gold transition-colors duration-300">
+              TRINKETS
+            </span>
+            <span className="text-[8px] tracking-[0.25em] text-luxury-gold uppercase font-light -mt-0.5">
+              Jewelry Rental Store
+            </span>
+          </Link>
+        </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-8 text-xs tracking-[0.2em] font-light text-slate-300">
