@@ -42,9 +42,19 @@ const WEDDING_COLLECTIONS = [
   { name: 'Reception Elegance', image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=400', link: '/wedding/reception-collection' }
 ];
 
+const VAULT_LOOKS = [
+  { id: 1, url: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=600', productId: 1, patron: 'Duchess Katherine', occasion: 'Autumn Charity Gala', product: 'The Empress Emerald Necklace' },
+  { id: 2, url: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=600', productId: 2, patron: 'Princess Ananya', occasion: 'Royal Sangeet Night', product: 'Royal Kundan Choker Set' },
+  { id: 3, url: 'https://images.unsplash.com/photo-1543294001-f7cbfe92237e?auto=format&fit=crop&q=80&w=600', productId: 3, patron: 'Lady Beatrice', occasion: 'Valkyrie Soirée', product: 'Valkyrie Diamond Tiara' },
+  { id: 4, url: 'https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&q=80&w=600', productId: 11, patron: 'Aria Sterling', occasion: 'Traditional Haldi Ceremony', product: 'Marigold Floral Haldi Choker' },
+  { id: 5, url: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=600', productId: 5, patron: 'Meera Rajput', occasion: 'Spring Mehndi Celebration', product: 'Ethereal Floral Haldi Set' },
+  { id: 6, url: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=600', productId: 7, patron: 'Viscountess Diana', occasion: 'Engagement Gala', product: 'Royal Solitaire Engagement Ring' }
+];
+
 function Home() {
   const { products, addToCart, toggleWishlist, wishlist, user } = useLuxe();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [activeLook, setActiveLook] = useState(null);
 
   // Select 4 trending items from our actual products catalog (IDs: 3, 1, 2, 4)
   const trendingItems = products.filter(p => [3, 1, 2, 4].includes(p.id));
@@ -283,20 +293,67 @@ function Home() {
       <section className="max-w-7xl mx-auto px-6 py-20">
         <h3 className="text-center font-serif text-lg text-white mb-8 tracking-widest uppercase">SHARE YOUR VAULT LOOKS #VALENTINALUXE</h3>
         <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-          {[
-            'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=250',
-            'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=250',
-            'https://images.unsplash.com/photo-1543294001-f7cbfe92237e?auto=format&fit=crop&q=80&w=250',
-            'https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&q=80&w=250',
-            'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=250',
-            'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=250'
-          ].map((url, idx) => (
-            <div key={idx} className="aspect-square overflow-hidden rounded-lg border border-slate-900 hover:border-gold-500/30 transition-colors">
-              <img src={url} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+          {VAULT_LOOKS.map((look) => (
+            <div 
+              key={look.id} 
+              onClick={() => setActiveLook(look)}
+              className="aspect-square overflow-hidden rounded-lg border border-slate-900 hover:border-gold-500/50 hover:shadow-lg hover:shadow-gold-500/5 transition-all duration-300 cursor-pointer group"
+            >
+              <img 
+                src={look.url} 
+                alt={look.product} 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+              />
             </div>
           ))}
         </div>
       </section>
+
+      {/* Lightbox / Patron Spotlight Modal */}
+      {activeLook && (
+        <div 
+          className="fixed inset-0 bg-luxury-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4"
+          onClick={() => setActiveLook(null)}
+        >
+          <div 
+            className="glass-panel max-w-md w-full rounded-2xl border border-gold-500/20 p-6 space-y-6 relative overflow-hidden shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            <button 
+              onClick={() => setActiveLook(null)} 
+              className="absolute top-4 right-4 text-slate-400 hover:text-white text-lg transition-colors focus:outline-none"
+            >
+              ✕
+            </button>
+            <div className="aspect-[4/3] rounded-xl overflow-hidden bg-luxury-dark border border-slate-900 shadow-inner">
+              <img src={activeLook.url} alt={activeLook.product} className="w-full h-full object-cover" />
+            </div>
+            <div className="space-y-2">
+              <span className="text-[9px] text-luxury-gold tracking-[0.25em] uppercase font-semibold">PATRON SPOTLIGHT</span>
+              <h4 className="text-xl font-serif text-white font-medium">{activeLook.patron}</h4>
+              <p className="text-xs text-slate-400 font-light italic">Adored for the {activeLook.occasion}</p>
+              <p className="text-xs text-slate-300 font-light pt-2">
+                Featured Piece: <strong className="text-luxury-gold font-serif font-normal">{activeLook.product}</strong>
+              </p>
+            </div>
+            <div className="pt-2 flex gap-3">
+              <Link 
+                to={`/product/${activeLook.productId}`}
+                onClick={() => setActiveLook(null)}
+                className="flex-1 py-3 text-center gold-gradient-bg text-luxury-black font-semibold text-xs tracking-widest uppercase rounded-lg hover:opacity-90 active:scale-[0.98] transition-all"
+              >
+                View Vault Item
+              </Link>
+              <button 
+                onClick={() => setActiveLook(null)} 
+                className="px-5 py-3 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 text-xs tracking-widest uppercase rounded-lg transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Brand Partners */}
       <section className="border-t border-slate-900 py-12">
