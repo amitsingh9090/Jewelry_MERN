@@ -1,23 +1,79 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useLuxe } from '../context/LuxeContext.jsx';
-import { Link } from 'react-router-dom';
+
+const slugify = (text) => text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
 
 function CulturalJewelry() {
-  const { products, addToCart, toggleWishlist, wishlist } = useLuxe();
+  const { cultureName } = useParams();
+  const navigate = useNavigate();
+  const { products, cultures, addToCart, toggleWishlist, wishlist } = useLuxe();
 
-  const filtered = products.filter(prod => prod.category === "Cultural Jewelry");
+  const selectedCulture = useMemo(() => {
+    if (!cultureName) return 'All';
+    const found = cultures.find(cult => slugify(cult) === cultureName);
+    return found || 'All';
+  }, [cultureName, cultures]);
+
+  const filtered = useMemo(() => {
+    if (selectedCulture === 'All') {
+      // Show products that have a culture assigned
+      return products.filter(prod => prod.culture && prod.culture.trim() !== '');
+    }
+    return products.filter(prod => prod.culture === selectedCulture);
+  }, [selectedCulture, products]);
+
+  const handleCultureSelect = (culture) => {
+    if (culture === 'All') {
+      navigate('/cultural');
+    } else {
+      navigate(`/cultural/${slugify(culture)}`);
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
       <div className="text-center mb-12 space-y-2">
-        <span className="text-xs tracking-[0.3em] text-luxury-gold uppercase font-semibold">VALENTINA CATEGORIES</span>
-        <h1 className="text-4xl md:text-5xl font-serif text-white">Cultural Heritage Wear</h1>
+        <span className="text-xs tracking-[0.3em] text-luxury-gold uppercase font-semibold">CULTURAL LEGACY</span>
+        <h1 className="text-4xl md:text-5xl font-serif text-white">
+          {selectedCulture === 'All' ? 'Cultural Heritage Wear' : selectedCulture}
+        </h1>
         <div className="w-12 h-[1px] bg-luxury-gold mx-auto mt-2" />
-        <p className="text-slate-400 text-sm max-w-lg mx-auto font-light pt-2">Traditional designs across historic dynasties, Mughal polki, and hand-carved details.</p>
+        <p className="text-slate-400 text-sm max-w-lg mx-auto font-light pt-2">
+          Traditional designs across historic dynasties, Mughal polki, and hand-carved details representing timeless heritage.
+        </p>
       </div>
 
+      {/* Culture Tabs */}
+      <div className="flex flex-wrap justify-center gap-2 mb-12">
+        <button
+          onClick={() => handleCultureSelect('All')}
+          className={`px-5 py-2 text-xs tracking-widest uppercase rounded border transition-all ${
+            selectedCulture === 'All'
+              ? 'bg-luxury-gold text-luxury-black border-luxury-gold font-semibold'
+              : 'border-slate-800 text-slate-400 hover:border-gold-500/30'
+          }`}
+        >
+          All Legacies
+        </button>
+        {cultures.map((cult) => (
+          <button
+            key={cult}
+            onClick={() => handleCultureSelect(cult)}
+            className={`px-5 py-2 text-xs tracking-widest uppercase rounded border transition-all ${
+              selectedCulture === cult
+                ? 'bg-luxury-gold text-luxury-black border-luxury-gold font-semibold'
+                : 'border-slate-800 text-slate-400 hover:border-gold-500/30'
+            }`}
+          >
+            {cult}
+          </button>
+        ))}
+      </div>
+
+      {/* Products Grid */}
       {filtered.length === 0 ? (
-        <div className="text-center text-slate-500 py-16">No items currently active in this vault section.</div>
+        <div className="text-center text-slate-500 py-16">No items currently active under this cultural design heritage.</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {filtered.map((prod) => {
@@ -34,6 +90,10 @@ function CulturalJewelry() {
                     </button>
                   </div>
                   <div className="space-y-2 mt-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] text-luxury-gold uppercase tracking-widest">{prod.culture}</span>
+                      {prod.rating && <span className="text-[10px] text-slate-400">⭐ {prod.rating}</span>}
+                    </div>
                     <h3 className="font-serif text-white text-lg font-medium">{prod.name}</h3>
                     <p className="text-xs text-slate-400 font-light line-clamp-2">{prod.description}</p>
                   </div>
@@ -48,7 +108,7 @@ function CulturalJewelry() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <Link to={`/product/${prod.id}`} className="text-center py-2.5 border border-slate-800 hover:border-gold-500 text-xs text-slate-300 hover:text-white transition-all uppercase rounded-lg">View Details</Link>
-                    <button onClick={() => { addToCart(prod, 1); alert(`${prod.name} added to cart!`); }} className="py-2.5 gold-gradient-bg text-luxury-black text-xs font-semibold uppercase tracking-wider rounded-lg hover:opacity-90 transition-all">Rent Now</button>
+                    <button onClick={() => { addToCart(prod, 1); }} className="py-2.5 gold-gradient-bg text-luxury-black text-xs font-semibold uppercase tracking-wider rounded-lg hover:opacity-90 transition-all">Rent Now</button>
                   </div>
                 </div>
               </div>

@@ -1,33 +1,66 @@
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useLuxe } from '../context/LuxeContext.jsx';
-import { Link } from 'react-router-dom';
+
+const slugify = (text) => text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
 
 function Festivals() {
-  const { products, addToCart, toggleWishlist, wishlist } = useLuxe();
-  const [selectedFestival, setSelectedFestival] = useState('All');
+  const { festivalName } = useParams();
+  const navigate = useNavigate();
+  const { products, festivals, addToCart, toggleWishlist, wishlist } = useLuxe();
 
-  const festivalsList = ['All', 'Diwali Sparkle', 'Eid Opulence', 'Navratri Heritage'];
+  const selectedFestival = useMemo(() => {
+    if (!festivalName) return 'All';
+    const found = festivals.find(fest => slugify(fest) === festivalName);
+    return found || 'All';
+  }, [festivalName, festivals]);
 
-  const filtered = products.filter(prod => {
-    if (!prod.festivals) return false;
-    return selectedFestival === 'All' || prod.festivals.includes(selectedFestival);
-  });
+  const filtered = useMemo(() => {
+    if (selectedFestival === 'All') {
+      // Show products that have at least one festival assigned
+      return products.filter(prod => prod.festivals && prod.festivals.length > 0);
+    }
+    return products.filter(prod => prod.festivals && prod.festivals.includes(selectedFestival));
+  }, [selectedFestival, products]);
+
+  const handleFestivalSelect = (festival) => {
+    if (festival === 'All') {
+      navigate('/festivals');
+    } else {
+      navigate(`/festivals/${slugify(festival)}`);
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
       <div className="text-center mb-12 space-y-2">
         <span className="text-xs tracking-[0.3em] text-luxury-gold uppercase font-semibold">CELEBRATIONAL ORNAMENTS</span>
-        <h1 className="text-4xl md:text-5xl font-serif text-white">Festival Collections</h1>
+        <h1 className="text-4xl md:text-5xl font-serif text-white">
+          {selectedFestival === 'All' ? 'Festival Collections' : selectedFestival}
+        </h1>
         <div className="w-12 h-[1px] bg-luxury-gold mx-auto mt-2" />
-        <p className="text-slate-400 text-sm max-w-lg mx-auto font-light pt-2">Dazzle in gold and diamond sets tailored specifically for ethnic celebrations.</p>
+        <p className="text-slate-400 text-sm max-w-lg mx-auto font-light pt-2">
+          Dazzle in gold and diamond sets tailored specifically for ethnic celebrations and auspicious occasions.
+        </p>
       </div>
 
-      <div className="flex justify-center gap-2 mb-8">
-        {festivalsList.map((fest) => (
+      {/* Festival Tabs */}
+      <div className="flex flex-wrap justify-center gap-2 mb-12">
+        <button
+          onClick={() => handleFestivalSelect('All')}
+          className={`px-5 py-2 text-xs tracking-widest uppercase rounded border transition-all ${
+            selectedFestival === 'All'
+              ? 'bg-luxury-gold text-luxury-black border-luxury-gold font-semibold'
+              : 'border-slate-800 text-slate-400 hover:border-gold-500/30'
+          }`}
+        >
+          All Festivals
+        </button>
+        {festivals.map((fest) => (
           <button
             key={fest}
-            onClick={() => setSelectedFestival(fest)}
-            className={`px-4 py-2 text-xs tracking-widest uppercase rounded border transition-all ${
+            onClick={() => handleFestivalSelect(fest)}
+            className={`px-5 py-2 text-xs tracking-widest uppercase rounded border transition-all ${
               selectedFestival === fest
                 ? 'bg-luxury-gold text-luxury-black border-luxury-gold font-semibold'
                 : 'border-slate-800 text-slate-400 hover:border-gold-500/30'
@@ -38,8 +71,9 @@ function Festivals() {
         ))}
       </div>
 
+      {/* Products Grid */}
       {filtered.length === 0 ? (
-        <div className="text-center text-slate-500 py-16">No items matching this festival selection.</div>
+        <div className="text-center text-slate-500 py-16">No items currently active for this festival selection.</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {filtered.map((prod) => {
@@ -56,6 +90,10 @@ function Festivals() {
                     </button>
                   </div>
                   <div className="space-y-2 mt-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] text-luxury-gold uppercase tracking-widest">{prod.category}</span>
+                      {prod.rating && <span className="text-[10px] text-slate-400">⭐ {prod.rating}</span>}
+                    </div>
                     <h3 className="font-serif text-white text-lg font-medium">{prod.name}</h3>
                     <p className="text-xs text-slate-400 font-light line-clamp-2">{prod.description}</p>
                   </div>
@@ -70,7 +108,7 @@ function Festivals() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <Link to={`/product/${prod.id}`} className="text-center py-2.5 border border-slate-800 hover:border-gold-500 text-xs text-slate-300 hover:text-white transition-all uppercase rounded-lg">View Details</Link>
-                    <button onClick={() => { addToCart(prod, 1); alert(`${prod.name} added to cart!`); }} className="py-2.5 gold-gradient-bg text-luxury-black text-xs font-semibold uppercase tracking-wider rounded-lg hover:opacity-90 transition-all">Rent Now</button>
+                    <button onClick={() => { addToCart(prod, 1); }} className="py-2.5 gold-gradient-bg text-luxury-black text-xs font-semibold uppercase tracking-wider rounded-lg hover:opacity-90 transition-all">Rent Now</button>
                   </div>
                 </div>
               </div>
