@@ -16,10 +16,10 @@ function Header() {
         <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate(-1)} 
-            className="hover:text-luxury-gold text-slate-400 hover:bg-slate-900/60 p-2 rounded-full transition-all focus:outline-none flex items-center justify-center cursor-pointer"
+            className="text-slate-300 bg-slate-900/40 border border-gold-500/10 backdrop-blur-md p-2 rounded-full shadow-lg hover:text-luxury-gold hover:border-gold-500/30 hover:scale-105 hover:bg-slate-900/60 active:scale-95 transition-all duration-300 focus:outline-none flex items-center justify-center cursor-pointer"
             title="Go Back"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
             </svg>
           </button>
