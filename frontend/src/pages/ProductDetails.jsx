@@ -116,7 +116,7 @@ function ProductDetails() {
               <button onClick={() => toggleWishlist(product.id)} className="w-full py-3 border border-slate-800 hover:border-gold-500 rounded-lg text-xs text-slate-300 font-semibold uppercase tracking-wider transition-colors">
                 {isWishlisted ? '❤️ Wishlisted' : '🤍 Add Wishlist'}
               </button>
-              <button onClick={() => { addToCart(product, qty, startDate, endDate); alert('Added to cart!'); }} className="w-full py-3 gold-gradient-bg text-luxury-black font-semibold text-xs rounded-lg uppercase tracking-wider">
+              <button onClick={() => addToCart(product, qty, startDate, endDate)} className="w-full py-3 gold-gradient-bg text-luxury-black font-semibold text-xs rounded-lg uppercase tracking-wider">
                 Rent Vault Piece
               </button>
             </div>

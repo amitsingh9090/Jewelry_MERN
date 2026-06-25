@@ -31,7 +31,7 @@ function Wishlist() {
               </div>
 
               <button
-                onClick={() => { addToCart(p, 1); toggleWishlist(p.id); alert('Moved to Cart!'); }}
+                onClick={() => { addToCart(p, 1); toggleWishlist(p.id); }}
                 className="w-full py-2.5 gold-gradient-bg text-luxury-black font-semibold text-xs rounded-lg uppercase tracking-wider"
               >
                 Move to Cart

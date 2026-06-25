@@ -48,7 +48,7 @@ function TempleJewelry() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <Link to={`/product/${prod.id}`} className="text-center py-2.5 border border-slate-800 hover:border-gold-500 text-xs text-slate-300 hover:text-white transition-all uppercase rounded-lg">View Details</Link>
-                    <button onClick={() => { addToCart(prod, 1); alert(`${prod.name} added to cart!`); }} className="py-2.5 gold-gradient-bg text-luxury-black text-xs font-semibold uppercase tracking-wider rounded-lg hover:opacity-90 transition-all">Rent Now</button>
+                    <button onClick={() => addToCart(prod, 1)} className="py-2.5 gold-gradient-bg text-luxury-black text-xs font-semibold uppercase tracking-wider rounded-lg hover:opacity-90 transition-all">Rent Now</button>
                   </div>
                 </div>
               </div>

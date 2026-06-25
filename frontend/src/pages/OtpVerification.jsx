@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 function OtpVerification() {
   const [code, setCode] = useState('');
@@ -8,10 +9,10 @@ function OtpVerification() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (code === '1234' || code.length === 4) {
-      alert('Code verified!');
+      toast.success('Code verified successfully!');
       navigate('/reset-password');
     } else {
-      alert('Enter any 4-digit code (e.g. 1234)');
+      toast.error('Enter any 4-digit code (e.g. 1234)');
     }
   };
 

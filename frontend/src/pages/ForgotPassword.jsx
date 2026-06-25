@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -8,7 +9,7 @@ function ForgotPassword() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!email) return;
-    alert('OTP sent to ' + email);
+    toast.success('OTP sent successfully to ' + email);
     navigate('/otp-verification');
   };
 

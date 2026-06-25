@@ -30,12 +30,11 @@ function Login() {
     addTicket(subject, message);
     setSubject('');
     setMessage('');
-    alert('Ticket submitted!');
   };
 
   const handleEditSubmit = (e) => {
     e.preventDefault();
-    if (!editName.trim()) return alert('Name is required');
+    if (!editName.trim()) return toast.error('Name is required');
     updateUserProfile(user.email, {
       name: editName,
       phone: editPhone,

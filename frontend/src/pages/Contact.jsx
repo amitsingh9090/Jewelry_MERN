@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 
 function Contact() {
   const [name, setName] = useState('');
@@ -6,7 +7,7 @@ function Contact() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert('Thank you ' + name + '! Your message was successfully sent to the concierge team.');
+    toast.success('Thank you ' + name + '! Your message was successfully sent to the concierge team.');
     setName('');
     setMsg('');
   };

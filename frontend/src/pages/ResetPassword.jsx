@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 function ResetPassword() {
   const [pass, setPass] = useState('');
@@ -7,7 +8,7 @@ function ResetPassword() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert('Password updated! Please login.');
+    toast.success('Password updated successfully! Please login.');
     navigate('/login');
   };
 

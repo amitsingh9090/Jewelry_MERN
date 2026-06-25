@@ -1,13 +1,18 @@
-import React, { useState, useMemo } from 'react';
-
-const JEWELRY_CATALOG = [
-  { id: 1, name: 'The Empress Emerald Necklace', dailyRent: 150, deposit: 1200, image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=600' },
-  { id: 2, name: 'Royal Kundan Choker Set', dailyRent: 95, deposit: 750, image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=600' },
-  { id: 3, name: 'Valkyrie Diamond Tiara', dailyRent: 280, deposit: 2500, image: 'https://images.unsplash.com/photo-1543294001-f7cbfe92237e?auto=format&fit=crop&q=80&w=600' }
-];
+import React, { useState, useMemo, useEffect } from 'react';
+import { useLuxe } from '../context/LuxeContext.jsx';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 function RentalCalculator() {
-  const [selectedId, setSelectedId] = useState(1);
+  const { products, addToCart } = useLuxe();
+  const navigate = useNavigate();
+  const [selectedId, setSelectedId] = useState('');
+
+  useEffect(() => {
+    if (products.length > 0 && !selectedId) {
+      setSelectedId(products[0].id);
+    }
+  }, [products, selectedId]);
   const [startDate, setStartDate] = useState(() => {
     const today = new Date();
     return today.toISOString().split('T')[0];
@@ -22,8 +27,8 @@ function RentalCalculator() {
   const [isCouponApplied, setIsCouponApplied] = useState(false);
 
   const selectedItem = useMemo(() => {
-    return JEWELRY_CATALOG.find(item => item.id === Number(selectedId)) || JEWELRY_CATALOG[0];
-  }, [selectedId]);
+    return products.find(item => String(item.id) === String(selectedId)) || products[0] || { id: '', name: 'Loading...', dailyRent: 0, deposit: 0, image: '' };
+  }, [selectedId, products]);
 
   const rentalDays = useMemo(() => {
     const start = new Date(startDate);
@@ -42,10 +47,17 @@ function RentalCalculator() {
     e.preventDefault();
     if (couponCode.toUpperCase() === 'LUXURY20') {
       setIsCouponApplied(true);
+      toast.success('20% promo code applied successfully!');
     } else {
       setIsCouponApplied(false);
-      alert('Invalid Promo Code! Use "LUXURY20" for 20% discount.');
+      toast.error('Invalid Promo Code! Use "LUXURY20" for 20% discount.');
     }
+  };
+
+  const handleBookRental = () => {
+    if (!selectedItem.id) return toast.error('No item selected.');
+    addToCart(selectedItem, quantity, startDate, endDate);
+    navigate('/cart');
   };
 
   return (
@@ -68,7 +80,7 @@ function RentalCalculator() {
                 onChange={(e) => setSelectedId(e.target.value)}
                 className="w-full bg-luxury-charcoal border border-slate-800 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-gold-500"
               >
-                {JEWELRY_CATALOG.map((item) => (
+                {products.map((item) => (
                   <option key={item.id} value={item.id}>{item.name}</option>
                 ))}
               </select>
@@ -141,7 +153,7 @@ function RentalCalculator() {
             </div>
           </div>
 
-          <button onClick={() => alert('Proceeding to Checkout...')} className="w-full py-3 rounded-lg gold-gradient-bg text-luxury-black font-semibold text-xs tracking-widest uppercase">
+          <button onClick={handleBookRental} className="w-full py-3 rounded-lg gold-gradient-bg text-luxury-black font-semibold text-xs tracking-widest uppercase">
             Book Rental Vault
           </button>
         </div>
