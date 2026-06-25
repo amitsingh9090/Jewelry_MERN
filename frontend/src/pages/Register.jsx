@@ -11,7 +11,7 @@ function Register() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name || !email || !password || !confirmPassword) {
       return toast.error('Please fill in all fields.');
@@ -19,9 +19,8 @@ function Register() {
     if (password !== confirmPassword) {
       return toast.error('Passwords do not match.');
     }
-    const success = register(name, email, password);
+    const success = await register(name, email, password);
     if (success) {
-      toast.success('Registration successful! Redirecting to profile.');
       navigate('/login');
     }
   };

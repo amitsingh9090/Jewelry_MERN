@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLuxe } from '../context/LuxeContext.jsx';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 function Checkout() {
-  const { cart, placeOrder } = useLuxe();
+  const { cart, placeOrder, user } = useLuxe();
   const navigate = useNavigate();
+
+  // Enforce login for checkout
+  useEffect(() => {
+    if (!user) {
+      toast.error('Please login to complete checkout.');
+      navigate('/login');
+    }
+  }, [user, navigate]);
 
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
@@ -22,12 +31,14 @@ function Checkout() {
 
   const grandTotal = totals.rent + totals.deposit + Math.round(totals.rent * 0.08);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name || !address || !card) return alert('Please complete all billing fields.');
-    const orderId = placeOrder(grandTotal);
-    alert(`Order ${orderId} Placed Successfully!`);
-    navigate('/login'); // Sends to login dashboard
+    if (!name || !address || !card) return toast.error('Please complete all billing fields.');
+    const orderId = await placeOrder(grandTotal);
+    if (orderId) {
+      toast.success(`Booking Placed successfully!`);
+      navigate('/login'); // Sends to login dashboard
+    }
   };
 
   return (

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useLuxe } from '../context/LuxeContext.jsx';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 function Login() {
   const { login, logout, user, orders, tickets, addTicket, updateUserProfile } = useLuxe();
@@ -17,10 +18,10 @@ function Login() {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password) return alert('Fill credentials');
-    login(email, password);
+    if (!email || !password) return toast.error('Please enter both email and password.');
+    await login(email, password);
   };
 
   const handleSupportSubmit = (e) => {
