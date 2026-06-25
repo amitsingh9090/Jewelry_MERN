@@ -6,12 +6,61 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
-// Initial dummy model for Module 1 setup verification
-model VerificationDummy {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
+model User {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  email           String   @unique
+  name            String
+  password        String
+  phone           String
+  address         String
+  avatar          String   @default("https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150")
+  hasAdminAccess  Boolean  @default(false)
+  createdAt       DateTime @default(now())
+}
+
+model Product {
+  id            String   @id @map("_id")
+  name          String
+  category      String
+  occasions     String[]
+  festivals     String[]
+  culture       String?
+  dailyRent     Float
+  deposit       Float
+  rating        Float    @default(5.0)
+  weight        String?
+  size          String?
+  material      String
+  image         String
+  description   String
+}
+
+model Order {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderId       String   @unique
+  customerName  String
+  customerEmail String
+  date          String
+  total         Float
+  status        String   @default("Active")
+  items         Json[]
+  createdAt     DateTime @default(now())
+}
+
+model AdminCredentials {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  username String @default("amit9115")
+  password String @default("12345")
+}
+
+model CmsConfig {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  categories String[]
+  festivals  String[]
+  cultures   String[]
+  occasions  String[]
 }

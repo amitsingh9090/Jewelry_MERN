@@ -3,6 +3,11 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import authRouter from './routes/authRoutes.js';
+import productRouter from './routes/productRoutes.js';
+import orderRouter from './routes/orderRoutes.js';
+import cmsRouter from './routes/cmsRoutes.js';
+import adminRouter from './routes/adminRoutes.js';
 
 const app = express();
 
@@ -33,6 +38,13 @@ app.use('/api', limiter);
 // Body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Register API routes
+app.use('/api/auth', authRouter);
+app.use('/api/products', productRouter);
+app.use('/api/orders', orderRouter);
+app.use('/api/cms', cmsRouter);
+app.use('/api/admin', adminRouter);
 
 // Health Check API
 app.get('/api/health', (req, res) => {

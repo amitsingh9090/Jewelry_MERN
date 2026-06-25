@@ -333,11 +333,18 @@ const INITIAL_PRODUCTS = [
   }
 ];
 
+const API_URL = 'http://localhost:5000/api';
+
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('luxe_token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+  };
+};
+
 export function LuxeProvider({ children }) {
-  const [products, setProducts] = useState(() => {
-    const saved = localStorage.getItem('luxe_products');
-    return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
-  });
+  const [products, setProducts] = useState([]);
   const [cart, setCart] = useState(() => {
     const saved = localStorage.getItem('luxe_cart');
     return saved ? JSON.parse(saved) : [];
@@ -346,79 +353,117 @@ export function LuxeProvider({ children }) {
     const saved = localStorage.getItem('luxe_wishlist');
     return saved ? JSON.parse(saved) : [];
   });
-  const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('luxe_user');
-    return saved ? JSON.parse(saved) : null;
-  });
-  const [users, setUsers] = useState(() => {
-    const saved = localStorage.getItem('luxe_users');
-    return saved ? JSON.parse(saved) : [
-      {
-        email: 'aria@sterling.com',
-        name: 'Aria Sterling',
-        phone: '+1 (555) 902-8822',
-        address: '742 Park Avenue, New York, NY 10021',
-        password: 'password123',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150',
-        hasAdminAccess: false
-      },
-      {
-        email: 'amit@example.com',
-        name: 'Amit Singh',
-        phone: '+91 9999999999',
-        address: 'New Delhi, India',
-        password: 'password123',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150',
-        hasAdminAccess: true
-      }
-    ];
-  });
-  const [adminCredentials, setAdminCredentials] = useState(() => {
-    const saved = localStorage.getItem('luxe_admin_credentials');
-    return saved ? JSON.parse(saved) : { username: 'amit9115', password: '12345' };
-  });
-  const [orders, setOrders] = useState(() => {
-    const saved = localStorage.getItem('luxe_orders');
-    return saved ? JSON.parse(saved) : [
-      {
-        id: 'ORD-82618',
-        customerName: 'Aria Sterling',
-        customerEmail: 'aria@sterling.com',
-        date: '2026-05-12',
-        total: 1358,
-        status: 'Returned',
-        items: [
-          { productId: 2, name: 'Royal Kundan Choker Set', dailyRent: 95, qty: 1, days: 3 }
-        ]
-      }
-    ];
-  });
+  const [user, setUser] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [adminCredentials, setAdminCredentials] = useState({ username: 'amit9115', password: '12345' });
+  const [orders, setOrders] = useState([]);
   const [tickets, setTickets] = useState([
     { id: 'TCK-102', subject: 'Custom Sizing Query', status: 'Closed', message: 'Resolved by support team' }
   ]);
 
   // CMS Configurations State
-  const [categories, setCategories] = useState(() => {
-    const saved = localStorage.getItem('luxe_categories');
-    return saved ? JSON.parse(saved) : ['Premium Jewelry', 'Temple Jewelry', 'Cultural Jewelry', 'Traditional Jewelry'];
-  });
-  const [festivals, setFestivals] = useState(() => {
-    const saved = localStorage.getItem('luxe_festivals');
-    return saved ? JSON.parse(saved) : ['Diwali Sparkle', 'Eid Opulence', 'Navratri Heritage'];
-  });
-  const [cultures, setCultures] = useState(() => {
-    const saved = localStorage.getItem('luxe_cultures');
-    return saved ? JSON.parse(saved) : ['Mughal Heritage', 'South Indian Divine', 'Rajputana Royalty', 'Victorian Elegance'];
-  });
-  const [occasions, setOccasions] = useState(() => {
-    const saved = localStorage.getItem('luxe_occasions');
-    return saved ? JSON.parse(saved) : ['Wedding Jewelry', 'Haldi Collection', 'Mehndi Collection', 'Engagement Collection', 'Reception Collection'];
-  });
+  const [categories, setCategories] = useState(['Premium Jewelry', 'Temple Jewelry', 'Cultural Jewelry', 'Traditional Jewelry']);
+  const [festivals, setFestivals] = useState(['Diwali Sparkle', 'Eid Opulence', 'Navratri Heritage']);
+  const [cultures, setCultures] = useState(['Mughal Heritage', 'South Indian Divine', 'Rajputana Royalty', 'Victorian Elegance']);
+  const [occasions, setOccasions] = useState(['Wedding Jewelry', 'Haldi Collection', 'Mehndi Collection', 'Engagement Collection', 'Reception Collection']);
 
+  const fetchUserData = async (token, loggedInUser) => {
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+
+    try {
+      if (loggedInUser.hasAdminAccess) {
+        const res = await fetch(`${API_URL}/orders`, { headers });
+        const data = await res.json();
+        if (res.ok) setOrders(data.orders);
+
+        const resUsers = await fetch(`${API_URL}/auth/users`, { headers });
+        const dataUsers = await resUsers.json();
+        if (resUsers.ok) setUsers(dataUsers.users);
+      } else {
+        const res = await fetch(`${API_URL}/orders/my-orders`, { headers });
+        const data = await res.json();
+        if (res.ok) setOrders(data.orders);
+      }
+    } catch (err) {
+      console.error("Error loading user-specific data:", err);
+    }
+  };
+
+  // Mount effects to load database records
   useEffect(() => {
-    localStorage.setItem('luxe_products', JSON.stringify(products));
-  }, [products]);
+    const loadCatalog = async () => {
+      try {
+        const res = await fetch(`${API_URL}/products`);
+        const data = await res.json();
+        if (res.ok) {
+          setProducts(data.products);
+        } else {
+          setProducts(INITIAL_PRODUCTS); // Fallback
+        }
+      } catch (err) {
+        console.error("Error loading catalog:", err);
+        setProducts(INITIAL_PRODUCTS); // Fallback
+      }
+    };
 
+    const loadCms = async () => {
+      try {
+        const res = await fetch(`${API_URL}/cms`);
+        const data = await res.json();
+        if (res.ok && data.config) {
+          setCategories(data.config.categories);
+          setFestivals(data.config.festivals);
+          setCultures(data.config.cultures);
+          setOccasions(data.config.occasions);
+        }
+      } catch (err) {
+        console.error("Error loading CMS configurations:", err);
+      }
+    };
+
+    const loadAdminCredentials = async () => {
+      try {
+        const res = await fetch(`${API_URL}/admin/credentials`);
+        const data = await res.json();
+        if (res.ok) {
+          setAdminCredentials({ username: data.username, password: data.password });
+        }
+      } catch (err) {
+        console.error("Error loading admin configurations:", err);
+      }
+    };
+
+    const loadProfile = async () => {
+      const token = localStorage.getItem('luxe_token');
+      if (token) {
+        try {
+          const res = await fetch(`${API_URL}/auth/profile`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const data = await res.json();
+          if (res.ok) {
+            setUser(data.user);
+            fetchUserData(token, data.user);
+          } else {
+            localStorage.removeItem('luxe_token');
+          }
+        } catch (err) {
+          console.error("Error loading profile session:", err);
+          localStorage.removeItem('luxe_token');
+        }
+      }
+    };
+
+    loadCatalog();
+    loadCms();
+    loadAdminCredentials();
+    loadProfile();
+  }, []);
+
+  // Cart/Wishlist localStorage Syncs (Remains local)
   useEffect(() => {
     localStorage.setItem('luxe_cart', JSON.stringify(cart));
   }, [cart]);
@@ -427,136 +472,259 @@ export function LuxeProvider({ children }) {
     localStorage.setItem('luxe_wishlist', JSON.stringify(wishlist));
   }, [wishlist]);
 
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem('luxe_user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('luxe_user');
-    }
-  }, [user]);
-
-  useEffect(() => {
-    localStorage.setItem('luxe_users', JSON.stringify(users));
-  }, [users]);
-
-  useEffect(() => {
-    localStorage.setItem('luxe_admin_credentials', JSON.stringify(adminCredentials));
-  }, [adminCredentials]);
-
-  useEffect(() => {
-    localStorage.setItem('luxe_orders', JSON.stringify(orders));
-  }, [orders]);
-
-  useEffect(() => {
-    localStorage.setItem('luxe_categories', JSON.stringify(categories));
-  }, [categories]);
-
-  useEffect(() => {
-    localStorage.setItem('luxe_festivals', JSON.stringify(festivals));
-  }, [festivals]);
-
-  useEffect(() => {
-    localStorage.setItem('luxe_cultures', JSON.stringify(cultures));
-  }, [cultures]);
-
-  useEffect(() => {
-    localStorage.setItem('luxe_occasions', JSON.stringify(occasions));
-  }, [occasions]);
-
   // Product CRUD
-  const addProduct = (prod) => {
-    const newProduct = {
-      ...prod,
-      id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
-      rating: 5.0
-    };
-    setProducts(prev => [...prev, newProduct]);
-    toast.success(`${newProduct.name} added to vault!`);
+  const addProduct = async (prod) => {
+    try {
+      const res = await fetch(`${API_URL}/products`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(prod)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setProducts(prev => [...prev, data.product]);
+      toast.success(`${data.product.name} added to vault!`);
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Error adding product.');
+      return false;
+    }
   };
 
-  const deleteProduct = (id) => {
-    setProducts(prev => prev.filter(p => p.id !== id));
-    toast.error('Item removed from vault.');
+  const deleteProduct = async (id) => {
+    try {
+      const res = await fetch(`${API_URL}/products/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setProducts(prev => prev.filter(p => p.id !== id));
+      toast.error('Item removed from vault.');
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Error deleting product.');
+      return false;
+    }
   };
 
-  // Order CRUD
-  const updateOrderStatus = (orderId, status) => {
-    setOrders(prev => prev.map(o =>
-      o.id === orderId ? { ...o, status } : o
-    ));
-    toast.success(`Order ${orderId} updated to: ${status}`);
-  };
-
-  // Product Edit
-  const updateProduct = (id, updatedFields) => {
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, ...updatedFields } : p));
-    toast.success('Product details updated successfully.');
+  const updateProduct = async (id, updatedFields) => {
+    try {
+      const res = await fetch(`${API_URL}/products/${id}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(updatedFields)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setProducts(prev => prev.map(p => p.id === id ? data.product : p));
+      toast.success('Product details updated successfully.');
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Error updating product.');
+      return false;
+    }
   };
 
   // User Profile edit
-  const updateUserProfile = (email, updatedFields) => {
-    setUsers(prev => prev.map(u => u.email.toLowerCase() === email.toLowerCase() ? { ...u, ...updatedFields } : u));
-    setUser(prev => prev && prev.email.toLowerCase() === email.toLowerCase() ? { ...prev, ...updatedFields } : prev);
-    toast.success('Your profile details have been saved.');
+  const updateUserProfile = async (email, updatedFields) => {
+    try {
+      const res = await fetch(`${API_URL}/auth/profile`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(updatedFields)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setUser(data.user);
+      setUsers(prev => prev.map(u => u.email.toLowerCase() === email.toLowerCase() ? { ...u, ...updatedFields } : u));
+      toast.success('Your profile details have been saved.');
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Error updating profile.');
+      return false;
+    }
   };
 
   // Admin control access
-  const toggleAdminAccess = (email) => {
-    setUsers(prev => prev.map(u => {
-      if (u.email.toLowerCase() === email.toLowerCase()) {
-        const nextVal = !u.hasAdminAccess;
-        toast.success(`Access ${nextVal ? 'granted' : 'revoked'} for ${u.name}`);
-        return { ...u, hasAdminAccess: nextVal };
+  const toggleAdminAccess = async (email) => {
+    try {
+      const res = await fetch(`${API_URL}/auth/users/${email}/toggle-access`, {
+        method: 'PUT',
+        headers: getAuthHeaders()
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setUsers(prev => prev.map(u => u.email.toLowerCase() === email.toLowerCase() ? { ...u, hasAdminAccess: data.hasAdminAccess } : u));
+      if (user && user.email.toLowerCase() === email.toLowerCase()) {
+        setUser(prev => ({ ...prev, hasAdminAccess: data.hasAdminAccess }));
       }
-      return u;
-    }));
+      toast.success(`Access updated successfully.`);
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Error toggling access.');
+      return false;
+    }
   };
 
-  const updateAdminCredentials = (username, password) => {
-    setAdminCredentials({ username, password });
-    toast.success('Admin credentials updated.');
+  const updateAdminCredentials = async (username, password) => {
+    try {
+      const res = await fetch(`${API_URL}/admin/credentials`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setAdminCredentials({ username: data.username, password: data.password });
+      toast.success('Admin credentials updated.');
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Error updating credentials.');
+      return false;
+    }
   };
 
   // CMS delete helpers
-  const deleteCategory = (name) => {
-    setCategories(prev => prev.filter(c => c !== name));
-    toast.error(`Category ${name} deleted.`);
+  const deleteCategory = async (name) => {
+    try {
+      const res = await fetch(`${API_URL}/cms/categories/${encodeURIComponent(name)}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setCategories(data.config.categories);
+      toast.error(`Category ${name} deleted.`);
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Error deleting category.');
+      return false;
+    }
   };
 
-  const deleteFestival = (name) => {
-    setFestivals(prev => prev.filter(f => f !== name));
-    toast.error(`Festival tag ${name} deleted.`);
+  const deleteFestival = async (name) => {
+    try {
+      const res = await fetch(`${API_URL}/cms/festivals/${encodeURIComponent(name)}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setFestivals(data.config.festivals);
+      toast.error(`Festival tag ${name} deleted.`);
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Error deleting festival.');
+      return false;
+    }
   };
 
-  const deleteCulture = (name) => {
-    setCultures(prev => prev.filter(c => c !== name));
-    toast.error(`Culture config ${name} deleted.`);
+  const deleteCulture = async (name) => {
+    try {
+      const res = await fetch(`${API_URL}/cms/cultures/${encodeURIComponent(name)}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setCultures(data.config.cultures);
+      toast.error(`Culture config ${name} deleted.`);
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Error deleting culture.');
+      return false;
+    }
   };
 
-  const deleteOccasion = (name) => {
-    setOccasions(prev => prev.filter(o => o !== name));
-    toast.error(`Occasion ${name} deleted.`);
+  const deleteOccasion = async (name) => {
+    try {
+      const res = await fetch(`${API_URL}/cms/occasions/${encodeURIComponent(name)}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setOccasions(data.config.occasions);
+      toast.error(`Occasion ${name} deleted.`);
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Error deleting occasion.');
+      return false;
+    }
   };
 
   // CMS CRUD
-  const addCategory = (name) => {
-    setCategories(prev => [...prev, name]);
-    toast.success(`Category ${name} created.`);
+  const addCategory = async (name) => {
+    try {
+      const res = await fetch(`${API_URL}/cms/categories`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ name })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setCategories(data.config.categories);
+      toast.success(`Category ${name} created.`);
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Error creating category.');
+      return false;
+    }
   };
 
-  const addFestival = (name) => {
-    setFestivals(prev => [...prev, name]);
-    toast.success(`Festival tag ${name} created.`);
+  const addFestival = async (name) => {
+    try {
+      const res = await fetch(`${API_URL}/cms/festivals`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ name })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setFestivals(data.config.festivals);
+      toast.success(`Festival tag ${name} created.`);
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Error creating festival.');
+      return false;
+    }
   };
 
-  const addCulture = (name) => {
-    setCultures(prev => [...prev, name]);
-    toast.success(`Culture config ${name} created.`);
+  const addCulture = async (name) => {
+    try {
+      const res = await fetch(`${API_URL}/cms/cultures`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ name })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setCultures(data.config.cultures);
+      toast.success(`Culture config ${name} created.`);
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Error creating culture.');
+      return false;
+    }
   };
 
-  const addOccasion = (name) => {
-    setOccasions(prev => [...prev, name]);
-    toast.success(`Occasion ${name} created.`);
+  const addOccasion = async (name) => {
+    try {
+      const res = await fetch(`${API_URL}/cms/occasions`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ name })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setOccasions(data.config.occasions);
+      toast.success(`Occasion ${name} created.`);
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Error creating occasion.');
+      return false;
+    }
   };
 
   // Cart operations
@@ -616,44 +784,51 @@ export function LuxeProvider({ children }) {
   };
 
   // Auth operations
-  const login = (email, password) => {
-    const found = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-    if (!found) {
-      toast.error('User profile not found. Please register.');
+  const login = async (email, password) => {
+    try {
+      const res = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      localStorage.setItem('luxe_token', data.token);
+      setUser(data.user);
+      toast.success(`Welcome back, ${data.user.name}!`);
+      fetchUserData(data.token, data.user);
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Incorrect login credentials.');
       return false;
     }
-    if (found.password !== password) {
-      toast.error('Incorrect password.');
-      return false;
-    }
-    setUser(found);
-    toast.success(`Welcome back, ${found.name}!`);
-    return true;
   };
 
-  const register = (name, email, password) => {
-    const exists = users.some(u => u.email.toLowerCase() === email.toLowerCase());
-    if (exists) {
-      toast.error('User already exists with this email.');
+  const register = async (name, email, password) => {
+    try {
+      const res = await fetch(`${API_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      localStorage.setItem('luxe_token', data.token);
+      setUser(data.user);
+      toast.success(`Account registered successfully. Welcome!`);
+      fetchUserData(data.token, data.user);
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Registration failed.');
       return false;
     }
-    const newUser = {
-      name,
-      email,
-      password,
-      phone: 'Please set your phone number',
-      address: 'Please set your shipping address',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150',
-      hasAdminAccess: false
-    };
-    setUsers(prev => [...prev, newUser]);
-    setUser(newUser);
-    toast.success(`Account registered successfully. Welcome!`);
-    return true;
   };
 
   const logout = () => {
+    localStorage.removeItem('luxe_token');
     setUser(null);
+    setUsers([]);
+    setOrders([]);
     toast.success(`Logged out successfully.`);
   };
 
@@ -672,15 +847,9 @@ export function LuxeProvider({ children }) {
     toast.success(`Support ticket ${newTicket.id} created!`);
   };
 
-  const placeOrder = (totalAmount) => {
-    const newOrder = {
-      id: `ORD-${Math.floor(10000 + Math.random() * 90000)}`,
-      customerName: user ? user.name : 'Guest User',
-      customerEmail: user ? user.email : 'guest@example.com',
-      date: new Date().toISOString().split('T')[0],
-      total: totalAmount,
-      status: 'Active',
-      items: cart.map(c => {
+  const placeOrder = async (totalAmount) => {
+    try {
+      const items = cart.map(c => {
         const start = new Date(c.startDate);
         const end = new Date(c.endDate);
         const diff = Math.max(0, end.getTime() - start.getTime());
@@ -692,21 +861,45 @@ export function LuxeProvider({ children }) {
           qty: c.qty,
           days
         };
-      })
-    };
-    setOrders(prev => [newOrder, ...prev]);
-    clearCart();
-    toast.success(`Booking Placed! Order: ${newOrder.id}`);
-    return newOrder.id;
+      });
+
+      const res = await fetch(`${API_URL}/orders`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ total: totalAmount, items })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setOrders(prev => [data.order, ...prev]);
+      clearCart();
+      toast.success(`Booking Placed! Order: ${data.order.orderId}`);
+      return data.order.orderId;
+    } catch (err) {
+      toast.error(err.message || 'Error booking order.');
+      return false;
+    }
   };
 
-  const returnOrder = (orderId) => {
-    setOrders(prev => prev.map(o =>
-      o.id === orderId ? { ...o, status: 'Returned' } : o
-    ));
-    toast.success(`Return Request Initiated! Secure transit collection for ${orderId} scheduled. Refund of deposit initiated.`, {
-      duration: 5000
-    });
+  const returnOrder = async (orderId) => {
+    try {
+      const localOrd = orders.find(o => o.orderId === orderId || o.id === orderId);
+      if (!localOrd) throw new Error("Order session not found.");
+
+      const res = await fetch(`${API_URL}/orders/${localOrd.id}/return`, {
+        method: 'PUT',
+        headers: getAuthHeaders()
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setOrders(prev => prev.map(o => o.id === data.order.id ? data.order : o));
+      toast.success(`Return Request Initiated! Secure transit collection scheduled.`, {
+        duration: 5000
+      });
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Error initiating return.');
+      return false;
+    }
   };
 
   return (

@@ -8,7 +8,7 @@ function ProductDetails() {
   const { products, addToCart, toggleWishlist, wishlist, addProductReview } = useLuxe();
   
   const product = useMemo(() => {
-    return products.find(p => p.id === Number(id)) || products[0];
+    return products.find(p => String(p.id) === String(id)) || products[0];
   }, [id, products]);
 
   // Date and calc state

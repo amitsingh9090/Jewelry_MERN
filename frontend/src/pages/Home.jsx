@@ -57,7 +57,7 @@ function Home() {
   const [activeLook, setActiveLook] = useState(null);
 
   // Select 4 trending items from our actual products catalog (IDs: 3, 1, 2, 4)
-  const trendingItems = products.filter(p => [3, 1, 2, 4].includes(p.id));
+  const trendingItems = products.filter(p => [3, 1, 2, 4].includes(Number(p.id)));
 
   // Auto-play slider
   useEffect(() => {
