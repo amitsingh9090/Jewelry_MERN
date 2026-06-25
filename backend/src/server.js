@@ -1,6 +1,5 @@
 import app from './app.js';
 import dotenv from 'dotenv';
-import { seedDatabase } from './seeder.js';
 
 // Load environment variables
 dotenv.config();
@@ -13,9 +12,6 @@ const server = app.listen(PORT, async () => {
   console.log(`  Port: ${PORT}`);
   console.log(`  Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`=============================================`);
-  
-  // Verify and seed database on connect
-  await seedDatabase();
 });
 
 // Handle uncaught exceptions

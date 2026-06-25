@@ -546,6 +546,24 @@ export function LuxeProvider({ children }) {
     }
   };
 
+  const updateOrderStatus = async (id, status) => {
+    try {
+      const res = await fetch(`${API_URL}/orders/${id}/status`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ status })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setOrders(prev => prev.map(o => o.id === id ? data.order : o));
+      toast.success(`Order status updated to: ${status}`);
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Error updating order status.');
+      return false;
+    }
+  };
+
   // Admin control access
   const toggleAdminAccess = async (email) => {
     try {

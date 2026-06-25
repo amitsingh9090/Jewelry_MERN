@@ -55,7 +55,7 @@ function Header() {
             {activeDropdown === 'collections' && (
               <div className="absolute top-full left-0 w-64 bg-luxury-dark/95 border border-gold-500/10 rounded-lg p-4 shadow-xl grid gap-2.5 z-50 backdrop-blur-md">
                 <Link to="/collections" className="text-[10px] text-slate-300 hover:text-luxury-gold tracking-widest block transition-colors font-semibold border-b border-slate-800 pb-1">ALL COLLECTIONS</Link>
-                {categories.map((cat) => (
+                {categories?.map((cat) => (
                   <Link 
                     key={cat}
                     to={`/collections/${slugify(cat)}`} 
@@ -77,7 +77,7 @@ function Header() {
             {activeDropdown === 'wedding' && (
               <div className="absolute top-full left-0 w-64 bg-luxury-dark/95 border border-gold-500/10 rounded-lg p-4 shadow-xl grid gap-2.5 z-50 backdrop-blur-md">
                 <Link to="/wedding" className="text-[10px] text-slate-300 hover:text-luxury-gold tracking-widest block transition-colors font-semibold border-b border-slate-800 pb-1">ALL WEDDING JEWELRY</Link>
-                {occasions.map((occ) => (
+                {occasions?.map((occ) => (
                   <Link 
                     key={occ}
                     to={`/wedding/${slugify(occ)}`} 
@@ -99,7 +99,7 @@ function Header() {
             {activeDropdown === 'culture' && (
               <div className="absolute top-full left-0 w-64 bg-luxury-dark/95 border border-gold-500/10 rounded-lg p-4 shadow-xl grid gap-2.5 z-50 backdrop-blur-md">
                 <Link to="/cultural" className="text-[10px] text-slate-300 hover:text-luxury-gold tracking-widest block transition-colors font-semibold border-b border-slate-800 pb-1">ALL CULTURAL</Link>
-                {cultures.map((cult) => (
+                {cultures?.map((cult) => (
                   <Link 
                     key={cult}
                     to={`/cultural/${slugify(cult)}`} 
@@ -121,7 +121,7 @@ function Header() {
             {activeDropdown === 'festivals' && (
               <div className="absolute top-full left-0 w-64 bg-luxury-dark/95 border border-gold-500/10 rounded-lg p-4 shadow-xl grid gap-2.5 z-50 backdrop-blur-md">
                 <Link to="/festivals" className="text-[10px] text-slate-300 hover:text-luxury-gold tracking-widest block transition-colors font-semibold border-b border-slate-800 pb-1">ALL FESTIVALS</Link>
-                {festivals.map((fest) => (
+                {festivals?.map((fest) => (
                   <Link 
                     key={fest}
                     to={`/festivals/${slugify(fest)}`} 
@@ -168,7 +168,7 @@ function Header() {
             <div className="space-y-2 py-1.5 border-b border-slate-900">
               <span className="text-[10px] text-luxury-gold uppercase tracking-[0.2em] font-bold block mb-1">COLLECTIONS</span>
               <Link to="/collections" onClick={() => setMobileMenuOpen(false)} className="block pl-4 text-[11px] text-slate-300 hover:text-luxury-gold transition-colors py-1">ALL COLLECTIONS</Link>
-              {categories.map((cat) => (
+              {categories?.map((cat) => (
                 <Link key={cat} to={`/collections/${slugify(cat)}`} onClick={() => setMobileMenuOpen(false)} className="block pl-4 text-[11px] text-slate-400 hover:text-luxury-gold transition-colors py-1 uppercase">{cat}</Link>
               ))}
             </div>
@@ -177,7 +177,7 @@ function Header() {
             <div className="space-y-2 py-1.5 border-b border-slate-900">
               <span className="text-[10px] text-luxury-gold uppercase tracking-[0.2em] font-bold block mb-1">WEDDING VAULT</span>
               <Link to="/wedding" onClick={() => setMobileMenuOpen(false)} className="block pl-4 text-[11px] text-slate-300 hover:text-luxury-gold transition-colors py-1">ALL WEDDING JEWELRY</Link>
-              {occasions.map((occ) => (
+              {occasions?.map((occ) => (
                 <Link key={occ} to={`/wedding/${slugify(occ)}`} onClick={() => setMobileMenuOpen(false)} className="block pl-4 text-[11px] text-slate-400 hover:text-luxury-gold transition-colors py-1 uppercase">{occ}</Link>
               ))}
             </div>
@@ -186,7 +186,7 @@ function Header() {
             <div className="space-y-2 py-1.5 border-b border-slate-900">
               <span className="text-[10px] text-luxury-gold uppercase tracking-[0.2em] font-bold block mb-1">CULTURES</span>
               <Link to="/cultural" onClick={() => setMobileMenuOpen(false)} className="block pl-4 text-[11px] text-slate-300 hover:text-luxury-gold transition-colors py-1">ALL CULTURAL</Link>
-              {cultures.map((cult) => (
+              {cultures?.map((cult) => (
                 <Link key={cult} to={`/cultural/${slugify(cult)}`} onClick={() => setMobileMenuOpen(false)} className="block pl-4 text-[11px] text-slate-400 hover:text-luxury-gold transition-colors py-1 uppercase">{cult}</Link>
               ))}
             </div>
@@ -195,7 +195,7 @@ function Header() {
             <div className="space-y-2 py-1.5 border-b border-slate-900">
               <span className="text-[10px] text-luxury-gold uppercase tracking-[0.2em] font-bold block mb-1">FESTIVALS</span>
               <Link to="/festivals" onClick={() => setMobileMenuOpen(false)} className="block pl-4 text-[11px] text-slate-300 hover:text-luxury-gold transition-colors py-1">ALL FESTIVALS</Link>
-              {festivals.map((fest) => (
+              {festivals?.map((fest) => (
                 <Link key={fest} to={`/festivals/${slugify(fest)}`} onClick={() => setMobileMenuOpen(false)} className="block pl-4 text-[11px] text-slate-400 hover:text-luxury-gold transition-colors py-1 uppercase">{fest}</Link>
               ))}
             </div>

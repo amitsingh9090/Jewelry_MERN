@@ -8,8 +8,12 @@ import productRouter from './routes/productRoutes.js';
 import orderRouter from './routes/orderRoutes.js';
 import cmsRouter from './routes/cmsRoutes.js';
 import adminRouter from './routes/adminRoutes.js';
+import { seedDatabase } from './seeder.js';
 
 const app = express();
+
+// Trigger database seeding on start
+seedDatabase().catch(err => console.error("Database seeding error:", err));
 
 // Request logging in development
 if (process.env.NODE_ENV === 'development') {
