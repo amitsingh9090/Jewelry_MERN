@@ -449,18 +449,31 @@ export function LuxeProvider({ children }) {
             fetchUserData(token, data.user);
           } else {
             localStorage.removeItem('luxe_token');
+            setUser(null);
           }
         } catch (err) {
           console.error("Error loading profile session:", err);
           localStorage.removeItem('luxe_token');
+          setUser(null);
         }
       }
     };
 
+    // Initial load
     loadCatalog();
     loadCms();
     loadAdminCredentials();
     loadProfile();
+
+    // Set up a 10-second polling interval for automatic sync
+    const pollInterval = setInterval(() => {
+      loadCatalog();
+      loadCms();
+      loadAdminCredentials();
+      loadProfile();
+    }, 10000);
+
+    return () => clearInterval(pollInterval);
   }, []);
 
   // Cart/Wishlist localStorage Syncs (Remains local)
