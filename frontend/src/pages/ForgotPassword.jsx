@@ -9,7 +9,7 @@ function ForgotPassword() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!email) return;
-    toast.success('OTP sent successfully to ' + email);
+    toast.success('A one-time verification code was sent to ' + email);
     navigate('/otp-verification');
   };
 

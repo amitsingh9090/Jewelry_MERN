@@ -8,9 +8,9 @@ function Cart() {
   const navigate = useNavigate();
 
   const handleCheckout = () => {
-    if (cart.length === 0) return toast.error('Your cart is currently empty.');
+    if (cart.length === 0) return toast.error('Your cart is empty. Please add items to book.');
     if (!user) {
-      toast.error('Please login to proceed to secure checkout.');
+      toast.error('Please sign in to proceed to checkout.');
       navigate('/login');
       return;
     }
@@ -75,7 +75,7 @@ function Cart() {
                     </div>
 
                     <div className="flex gap-2">
-                      <button onClick={() => { toggleWishlist(item.product.id); removeFromCart(item.product.id); toast.success('Moved to wishlist!'); }} className="text-xs text-gold-500 hover:text-gold-300" title="Move to Wishlist">❤️</button>
+                      <button onClick={() => { toggleWishlist(item.product.id); removeFromCart(item.product.id); toast.success('Item moved to your wishlist!'); }} className="text-xs text-gold-500 hover:text-gold-300" title="Move to Wishlist">❤️</button>
                       <button onClick={() => removeFromCart(item.product.id)} className="text-xs text-rose-500 hover:text-rose-400" title="Remove">🗑️</button>
                     </div>
                   </div>

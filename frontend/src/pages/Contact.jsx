@@ -7,7 +7,7 @@ function Contact() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    toast.success('Thank you ' + name + '! Your message was successfully sent to the concierge team.');
+    toast.success('Thank you ' + name + '! Your message has been sent successfully.');
     setName('');
     setMsg('');
   };

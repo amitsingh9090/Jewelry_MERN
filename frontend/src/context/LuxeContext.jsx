@@ -774,12 +774,12 @@ export function LuxeProvider({ children }) {
       }
       return [...prev, { product, qty, startDate: defaultStart, endDate: defaultEnd }];
     });
-    toast.success(`${product.name} added to cart!`);
+    toast.success(`${product.name} has been added to your cart!`);
   };
 
   const removeFromCart = (productId) => {
     setCart((prev) => prev.filter(item => item.product.id !== productId));
-    toast.error(`Item removed from cart.`);
+    toast.error('Item has been removed from your cart.');
   };
 
   const updateCartQty = (productId, qty) => {
@@ -808,9 +808,9 @@ export function LuxeProvider({ children }) {
     });
     const item = products.find(p => p.id === productId);
     if (active) {
-      toast.success(`${item?.name} added to wishlist!`);
+      toast.success(`${item?.name} has been added to your wishlist!`);
     } else {
-      toast.error(`Removed from wishlist.`);
+      toast.error('Item removed from your wishlist.');
     }
   };
 
@@ -830,7 +830,7 @@ export function LuxeProvider({ children }) {
       fetchUserData(data.token, data.user);
       return true;
     } catch (err) {
-      toast.error(err.message || 'Incorrect login credentials.');
+      toast.error(err.message || 'Incorrect email or password. Please check and try again.');
       return false;
     }
   };
@@ -846,11 +846,11 @@ export function LuxeProvider({ children }) {
       if (!res.ok) throw new Error(data.message);
       localStorage.setItem('luxe_token', data.token);
       setUser(data.user);
-      toast.success(`Account registered successfully. Welcome!`);
+      toast.success('Your account has been created successfully. Welcome!');
       fetchUserData(data.token, data.user);
       return true;
     } catch (err) {
-      toast.error(err.message || 'Registration failed.');
+      toast.error(err.message || 'Sign up failed. Please try again.');
       return false;
     }
   };
@@ -860,7 +860,7 @@ export function LuxeProvider({ children }) {
     setUser(null);
     setUsers([]);
     setOrders([]);
-    toast.success(`Logged out successfully.`);
+    toast.success('You have logged out successfully.');
   };
 
   const addProductReview = (productId, review) => {
@@ -903,10 +903,10 @@ export function LuxeProvider({ children }) {
       if (!res.ok) throw new Error(data.message);
       setOrders(prev => [data.order, ...prev]);
       clearCart();
-      toast.success(`Booking Placed! Order: ${data.order.orderId}`);
+      toast.success(`Booking successful! Your order ID is ${data.order.orderId}`);
       return data.order.orderId;
     } catch (err) {
-      toast.error(err.message || 'Error booking order.');
+      toast.error(err.message || 'Could not place your booking. Please try again.');
       return false;
     }
   };
@@ -923,12 +923,12 @@ export function LuxeProvider({ children }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
       setOrders(prev => prev.map(o => o.id === data.order.id ? data.order : o));
-      toast.success(`Return Request Initiated! Secure transit collection scheduled.`, {
+      toast.success('Return request sent successfully! We will coordinate the pickup with you.', {
         duration: 5000
       });
       return true;
     } catch (err) {
-      toast.error(err.message || 'Error initiating return.');
+      toast.error(err.message || 'Could not start the return request. Please try again.');
       return false;
     }
   };

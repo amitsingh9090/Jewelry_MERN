@@ -12,7 +12,7 @@ function OtpVerification() {
       toast.success('Code verified successfully!');
       navigate('/reset-password');
     } else {
-      toast.error('Enter any 4-digit code (e.g. 1234)');
+      toast.error('Please enter a valid 4-digit verification code.');
     }
   };
 

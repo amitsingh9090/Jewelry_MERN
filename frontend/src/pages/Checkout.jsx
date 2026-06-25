@@ -10,7 +10,7 @@ function Checkout() {
   // Enforce login for checkout
   useEffect(() => {
     if (!user) {
-      toast.error('Please login to complete checkout.');
+      toast.error('Please sign in to complete your checkout.');
       navigate('/login');
     }
   }, [user, navigate]);
@@ -33,10 +33,10 @@ function Checkout() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name || !address || !card) return toast.error('Please complete all billing fields.');
+    if (!name || !address || !card) return toast.error('Please fill in all checkout details.');
     const orderId = await placeOrder(grandTotal);
     if (orderId) {
-      toast.success(`Booking Placed successfully!`);
+      toast.success('Your booking has been placed successfully!');
       navigate('/login'); // Sends to login dashboard
     }
   };

@@ -47,15 +47,15 @@ function RentalCalculator() {
     e.preventDefault();
     if (couponCode.toUpperCase() === 'LUXURY20') {
       setIsCouponApplied(true);
-      toast.success('20% promo code applied successfully!');
+      toast.success('20% discount code applied successfully!');
     } else {
       setIsCouponApplied(false);
-      toast.error('Invalid Promo Code! Use "LUXURY20" for 20% discount.');
+      toast.error('Invalid promo code. You can use code "LUXURY20" for a 20% discount.');
     }
   };
 
   const handleBookRental = () => {
-    if (!selectedItem.id) return toast.error('No item selected.');
+    if (!selectedItem.id) return toast.error('Please select an item first.');
     addToCart(selectedItem, quantity, startDate, endDate);
     navigate('/cart');
   };

@@ -8,7 +8,7 @@ function ResetPassword() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    toast.success('Password updated successfully! Please login.');
+    toast.success('Your password has been reset successfully! Please log in.');
     navigate('/login');
   };
 
