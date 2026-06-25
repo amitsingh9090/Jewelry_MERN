@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { useLuxe } from '../context/LuxeContext.jsx';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 function Login() {
   const { login, logout, user, orders, tickets, addTicket, updateUserProfile } = useLuxe();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
@@ -13,15 +14,18 @@ function Login() {
   const [editName, setEditName] = useState('');
   const [editPhone, setEditPhone] = useState('');
   const [editAddress, setEditAddress] = useState('');
-
+ 
   // Support ticket form
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
-
+ 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) return toast.error('Please enter both email and password.');
-    await login(email, password);
+    const success = await login(email, password);
+    if (success) {
+      navigate('/');
+    }
   };
 
   const handleSupportSubmit = (e) => {

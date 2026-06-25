@@ -15,7 +15,7 @@ const signToken = (id) => {
 // 1. REGISTER
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone, address } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Name, email, and password are required.' });
     }
@@ -34,8 +34,8 @@ router.post('/register', async (req, res) => {
         name,
         email: email.toLowerCase(),
         password: hashedPassword,
-        phone: 'Please set your phone number',
-        address: 'Please set your shipping address'
+        phone: phone || 'Please set your phone number',
+        address: address || 'Please set your shipping address'
       }
     });
 

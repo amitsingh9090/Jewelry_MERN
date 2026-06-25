@@ -7,7 +7,7 @@ const slugify = (text) => text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\
 function Header() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { cart, categories, occasions, cultures, festivals } = useLuxe();
+  const { cart, categories, occasions, cultures, festivals, user } = useLuxe();
   const navigate = useNavigate();
 
   return (
@@ -149,10 +149,17 @@ function Header() {
               </span>
             )}
           </Link>
-          <Link to="/login" className="hover:text-luxury-gold transition-colors" title="Account Dashboard">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
+          <Link to="/login" className="hover:text-luxury-gold transition-colors flex items-center gap-1.5" title="Account Dashboard">
+            {user ? (
+              <div className="flex items-center gap-1.5 border border-gold-500/10 hover:border-gold-500/30 rounded-full py-0.5 px-2 bg-slate-900/30">
+                <img src={user.avatar} className="w-4 h-4 rounded-full object-cover border border-gold-500/20" alt="" />
+                <span className="text-[9px] tracking-widest hidden sm:inline uppercase text-gold-300 font-semibold">{user.name.split(' ')[0]}</span>
+              </div>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            )}
           </Link>
         </div>
       </div>
