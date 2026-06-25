@@ -343,6 +343,15 @@ const getAuthHeaders = () => {
   };
 };
 
+const safeJson = async (res) => {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch (err) {
+    throw new Error(`Server returned an invalid response (Status ${res.status}). Please make sure the backend server is running.`);
+  }
+};
+
 export function LuxeProvider({ children }) {
   let logout;
   const originalFetch = window.fetch;
@@ -368,7 +377,7 @@ export function LuxeProvider({ children }) {
           });
           
           if (refreshRes.ok) {
-            const refreshData = await refreshRes.json();
+            const refreshData = await safeJson(refreshRes);
             const rememberMe = !!localStorage.getItem('luxe_rememberMe');
             
             if (rememberMe) {
@@ -427,15 +436,15 @@ export function LuxeProvider({ children }) {
     try {
       if (loggedInUser.hasAdminAccess) {
         const res = await fetch(`${API_URL}/orders`, { headers });
-        const data = await res.json();
+        const data = await safeJson(res);
         if (res.ok) setOrders(data.orders);
 
         const resUsers = await fetch(`${API_URL}/auth/users`, { headers });
-        const dataUsers = await resUsers.json();
+        const dataUsers = await safeJson(resUsers);
         if (resUsers.ok) setUsers(dataUsers.users);
       } else {
         const res = await fetch(`${API_URL}/orders/my-orders`, { headers });
-        const data = await res.json();
+        const data = await safeJson(res);
         if (res.ok) setOrders(data.orders);
       }
     } catch (err) {
@@ -448,7 +457,7 @@ export function LuxeProvider({ children }) {
     const loadCatalog = async () => {
       try {
         const res = await fetch(`${API_URL}/products`);
-        const data = await res.json();
+        const data = await safeJson(res);
         if (res.ok) {
           setProducts(data.products);
         } else {
@@ -463,7 +472,7 @@ export function LuxeProvider({ children }) {
     const loadCms = async () => {
       try {
         const res = await fetch(`${API_URL}/cms`);
-        const data = await res.json();
+        const data = await safeJson(res);
         if (res.ok && data.config) {
           setCategories(data.config.categories);
           setFestivals(data.config.festivals);
@@ -478,7 +487,7 @@ export function LuxeProvider({ children }) {
     const loadAdminCredentials = async () => {
       try {
         const res = await fetch(`${API_URL}/admin/credentials`);
-        const data = await res.json();
+        const data = await safeJson(res);
         if (res.ok) {
           setAdminCredentials({ username: data.username, password: data.password });
         }
@@ -492,7 +501,7 @@ export function LuxeProvider({ children }) {
       if (token) {
         try {
           const res = await fetch(`${API_URL}/auth/profile`);
-          const data = await res.json();
+          const data = await safeJson(res);
           if (res.ok) {
             setUser(data.user);
             fetchUserData(token, data.user);
@@ -868,7 +877,7 @@ export function LuxeProvider({ children }) {
         method: 'POST',
         body: JSON.stringify({ email, password })
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) throw new Error(data.message);
 
       if (rememberMe) {
@@ -897,7 +906,7 @@ export function LuxeProvider({ children }) {
         method: 'POST',
         body: JSON.stringify({ name, email, password, phone, address })
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) throw new Error(data.message);
 
       sessionStorage.setItem('luxe_accessToken', data.accessToken);
@@ -948,7 +957,7 @@ export function LuxeProvider({ children }) {
         method: 'POST',
         body: JSON.stringify({ email })
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) throw new Error(data.message);
       toast.success(data.message || 'OTP sent successfully!');
       return true;
@@ -964,7 +973,7 @@ export function LuxeProvider({ children }) {
         method: 'POST',
         body: JSON.stringify({ email, code })
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) throw new Error(data.message);
       toast.success(data.message || 'Code verified successfully!');
       return true;
@@ -980,7 +989,7 @@ export function LuxeProvider({ children }) {
         method: 'POST',
         body: JSON.stringify({ email, code, password })
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) throw new Error(data.message);
       toast.success(data.message || 'Password reset successfully!');
       return true;
@@ -1026,7 +1035,7 @@ export function LuxeProvider({ children }) {
         headers: getAuthHeaders(),
         body: JSON.stringify({ total: totalAmount, items })
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) throw new Error(data.message);
       setOrders(prev => [data.order, ...prev]);
       clearCart();
@@ -1047,7 +1056,7 @@ export function LuxeProvider({ children }) {
         method: 'PUT',
         headers: getAuthHeaders()
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) throw new Error(data.message);
       setOrders(prev => prev.map(o => o.id === data.order.id ? data.order : o));
       toast.success('Return request sent successfully! We will coordinate the pickup with you.', {
