@@ -344,6 +344,57 @@ const getAuthHeaders = () => {
 };
 
 export function LuxeProvider({ children }) {
+  let logout;
+  const originalFetch = window.fetch;
+  
+  const fetch = async (url, options = {}) => {
+    let accessToken = localStorage.getItem('luxe_accessToken') || sessionStorage.getItem('luxe_accessToken');
+    options.headers = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+      ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {})
+    };
+
+    try {
+      let res = await originalFetch(url, options);
+      
+      if (res.status === 401 && !url.includes('/auth/refresh-token') && !url.includes('/auth/login') && !url.includes('/auth/register')) {
+        const refreshToken = localStorage.getItem('luxe_refreshToken') || sessionStorage.getItem('luxe_refreshToken');
+        if (refreshToken) {
+          const refreshRes = await originalFetch(`${API_URL}/auth/refresh-token`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refreshToken })
+          });
+          
+          if (refreshRes.ok) {
+            const refreshData = await refreshRes.json();
+            const rememberMe = !!localStorage.getItem('luxe_rememberMe');
+            
+            if (rememberMe) {
+              localStorage.setItem('luxe_accessToken', refreshData.accessToken);
+              localStorage.setItem('luxe_refreshToken', refreshData.refreshToken);
+            } else {
+              sessionStorage.setItem('luxe_accessToken', refreshData.accessToken);
+              sessionStorage.setItem('luxe_refreshToken', refreshData.refreshToken);
+            }
+            
+            options.headers['Authorization'] = `Bearer ${refreshData.accessToken}`;
+            res = await originalFetch(url, options);
+          } else {
+            await logout();
+          }
+        } else {
+          await logout();
+        }
+      }
+      return res;
+    } catch (err) {
+      console.error("Fetch interceptor error:", err);
+      throw err;
+    }
+  };
+
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState(() => {
     const saved = localStorage.getItem('luxe_cart');
@@ -437,24 +488,20 @@ export function LuxeProvider({ children }) {
     };
 
     const loadProfile = async () => {
-      const token = localStorage.getItem('luxe_token');
+      const token = localStorage.getItem('luxe_accessToken') || sessionStorage.getItem('luxe_accessToken');
       if (token) {
         try {
-          const res = await fetch(`${API_URL}/auth/profile`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
+          const res = await fetch(`${API_URL}/auth/profile`);
           const data = await res.json();
           if (res.ok) {
             setUser(data.user);
             fetchUserData(token, data.user);
           } else {
-            localStorage.removeItem('luxe_token');
-            setUser(null);
+            await logout();
           }
         } catch (err) {
           console.error("Error loading profile session:", err);
-          localStorage.removeItem('luxe_token');
-          setUser(null);
+          await logout();
         }
       }
     };
@@ -815,19 +862,28 @@ export function LuxeProvider({ children }) {
   };
 
   // Auth operations
-  const login = async (email, password) => {
+  const login = async (email, password, rememberMe = false) => {
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
-      localStorage.setItem('luxe_token', data.token);
+
+      if (rememberMe) {
+        localStorage.setItem('luxe_accessToken', data.accessToken);
+        localStorage.setItem('luxe_refreshToken', data.refreshToken);
+        localStorage.setItem('luxe_rememberMe', 'true');
+      } else {
+        sessionStorage.setItem('luxe_accessToken', data.accessToken);
+        sessionStorage.setItem('luxe_refreshToken', data.refreshToken);
+        localStorage.removeItem('luxe_rememberMe');
+      }
+
       setUser(data.user);
       toast.success(`Welcome back, ${data.user.name}!`);
-      fetchUserData(data.token, data.user);
+      fetchUserData(data.accessToken, data.user);
       return true;
     } catch (err) {
       toast.error(err.message || 'Incorrect email or password. Please check and try again.');
@@ -839,15 +895,18 @@ export function LuxeProvider({ children }) {
     try {
       const res = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, phone, address })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
-      localStorage.setItem('luxe_token', data.token);
+
+      sessionStorage.setItem('luxe_accessToken', data.accessToken);
+      sessionStorage.setItem('luxe_refreshToken', data.refreshToken);
+      localStorage.removeItem('luxe_rememberMe');
+
       setUser(data.user);
       toast.success('Your account has been created successfully. Welcome!');
-      fetchUserData(data.token, data.user);
+      fetchUserData(data.accessToken, data.user);
       return true;
     } catch (err) {
       toast.error(err.message || 'Sign up failed. Please try again.');
@@ -855,12 +914,80 @@ export function LuxeProvider({ children }) {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('luxe_token');
+  logout = async () => {
+    try {
+      const token = localStorage.getItem('luxe_accessToken') || sessionStorage.getItem('luxe_accessToken');
+      if (token) {
+        await originalFetch(`${API_URL}/auth/logout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+      }
+    } catch (err) {
+      console.error("Logout API error:", err);
+    }
+    
+    localStorage.removeItem('luxe_accessToken');
+    localStorage.removeItem('luxe_refreshToken');
+    localStorage.removeItem('luxe_rememberMe');
+    sessionStorage.removeItem('luxe_accessToken');
+    sessionStorage.removeItem('luxe_refreshToken');
+
     setUser(null);
     setUsers([]);
     setOrders([]);
     toast.success('You have logged out successfully.');
+  };
+
+  const forgotPassword = async (email) => {
+    try {
+      const res = await fetch(`${API_URL}/auth/forgot-password`, {
+        method: 'POST',
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      toast.success(data.message || 'OTP sent successfully!');
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Could not send verification code.');
+      return false;
+    }
+  };
+
+  const verifyOtp = async (email, code) => {
+    try {
+      const res = await fetch(`${API_URL}/auth/verify-otp`, {
+        method: 'POST',
+        body: JSON.stringify({ email, code })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      toast.success(data.message || 'Code verified successfully!');
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Invalid or expired code.');
+      return false;
+    }
+  };
+
+  const resetPassword = async (email, code, password) => {
+    try {
+      const res = await fetch(`${API_URL}/auth/reset-password`, {
+        method: 'POST',
+        body: JSON.stringify({ email, code, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      toast.success(data.message || 'Password reset successfully!');
+      return true;
+    } catch (err) {
+      toast.error(err.message || 'Could not reset password.');
+      return false;
+    }
   };
 
   const addProductReview = (productId, review) => {
@@ -970,6 +1097,9 @@ export function LuxeProvider({ children }) {
       login,
       register,
       logout,
+      forgotPassword,
+      verifyOtp,
+      resetPassword,
       placeOrder,
       returnOrder,
       addProductReview,
