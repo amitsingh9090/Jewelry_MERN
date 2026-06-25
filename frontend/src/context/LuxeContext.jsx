@@ -465,13 +465,13 @@ export function LuxeProvider({ children }) {
     loadAdminCredentials();
     loadProfile();
 
-    // Set up a 10-second polling interval for automatic sync
+    // Set up a 3-second polling interval for automatic sync
     const pollInterval = setInterval(() => {
       loadCatalog();
       loadCms();
       loadAdminCredentials();
       loadProfile();
-    }, 10000);
+    }, 3000);
 
     return () => clearInterval(pollInterval);
   }, []);
