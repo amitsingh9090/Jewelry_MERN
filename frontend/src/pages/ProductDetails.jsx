@@ -30,6 +30,15 @@ function ProductDetails() {
     return Math.ceil(diff / (1000 * 60 * 60 * 24)) || 1;
   }, [startDate, endDate]);
 
+  if (!product) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-20 min-h-[60vh] flex flex-col justify-center items-center text-center space-y-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-luxury-gold"></div>
+        <p className="text-sm text-slate-500 font-light">Retrieving pristine vault item details...</p>
+      </div>
+    );
+  }
+
   const isWishlisted = wishlist.includes(product.id);
 
   const handleReviewSubmit = (e) => {
