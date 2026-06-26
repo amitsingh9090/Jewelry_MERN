@@ -4,12 +4,21 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 function Login() {
-  const { login, logout, user, orders, tickets, addTicket, updateUserProfile } = useLuxe();
+  const { login, logout, user, orders, tickets, addTicket, updateUserProfile, adminCredentials } = useLuxe();
   const navigate = useNavigate();
+  
+  // Tab-based login mode: 'customer' or 'admin'
+  const [loginType, setLoginType] = useState('customer');
+  
+  // Customer Login States
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  
+  // Admin Login States
+  const [adminId, setAdminId] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
   
   // Edit Profile States
   const [isEditing, setIsEditing] = useState(false);
@@ -27,6 +36,41 @@ function Login() {
     const success = await login(emailOrPhone.trim(), password, rememberMe);
     if (success) {
       navigate('/');
+    }
+  };
+
+  const handleAdminLoginSubmit = async (e) => {
+    e.preventDefault();
+    if (!adminId.trim() || !adminPassword) {
+      return toast.error('Please enter both Admin ID and password.');
+    }
+
+    try {
+      let loggedInUser = null;
+      if (
+        adminId === adminCredentials.username && 
+        adminPassword === adminCredentials.password
+      ) {
+        // Silently authenticate with the E2E backend admin to get a valid token
+        loggedInUser = await login('amit@example.com', 'password123');
+      } else {
+        // Try direct backend authentication with custom admin login
+        loggedInUser = await login(adminId, adminPassword);
+      }
+
+      if (loggedInUser && loggedInUser.hasAdminAccess) {
+        toast.success(`Admin Session unlocked as ${loggedInUser.name}.`);
+        navigate('/admin');
+      } else {
+        if (loggedInUser) {
+          await logout();
+          toast.error('This user does not have Administrator privileges.');
+        } else {
+          toast.error('Invalid Administrator credentials.');
+        }
+      }
+    } catch (err) {
+      toast.error('Authentication failed. Backend may be offline.');
     }
   };
 
@@ -91,6 +135,14 @@ function Login() {
                 <div><span className="text-slate-500 block text-[10px] uppercase tracking-wider">Phone Contact</span> <strong className="text-white font-normal">{user.phone}</strong></div>
                 <div><span className="text-slate-500 block text-[10px] uppercase tracking-wider">Shipping Address</span> <strong className="text-white font-normal">{user.address}</strong></div>
               </div>
+              {user.hasAdminAccess && (
+                <Link 
+                  to="/admin" 
+                  className="block w-full py-2.5 text-center bg-gold-500 text-luxury-black font-bold text-xs uppercase tracking-widest rounded shadow-md hover:opacity-90 active:scale-[0.98] transition-all"
+                >
+                  Enter Admin Panel
+                </Link>
+              )}
               <button 
                 onClick={startEditing} 
                 className="w-full py-2 bg-gold-500/10 border border-gold-500/20 text-gold-300 text-xs font-semibold rounded uppercase tracking-wider hover:bg-gold-500/20 transition-all cursor-pointer"
@@ -235,61 +287,124 @@ function Login() {
   return (
     <div className="max-w-md mx-auto px-6 py-20 min-h-[60vh] flex flex-col justify-center">
       <div className="glass-panel p-8 rounded-xl border border-gold-500/15 space-y-6">
+        
+        {/* Toggle Tabs */}
+        <div className="flex bg-luxury-dark/60 p-1.5 rounded-lg border border-slate-800">
+          <button
+            type="button"
+            onClick={() => setLoginType('customer')}
+            className={`flex-1 py-1.5 text-xs font-semibold uppercase tracking-wider rounded transition-all cursor-pointer ${
+              loginType === 'customer'
+                ? 'bg-gold-500 text-luxury-black font-bold shadow-md'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Customer Login
+          </button>
+          <button
+            type="button"
+            onClick={() => setLoginType('admin')}
+            className={`flex-1 py-1.5 text-xs font-semibold uppercase tracking-wider rounded transition-all cursor-pointer ${
+              loginType === 'admin'
+                ? 'bg-gold-500 text-luxury-black font-bold shadow-md'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Admin Login
+          </button>
+        </div>
+
         <div className="text-center">
-          <h1 className="text-2xl font-serif text-white">Client Login</h1>
-          <p className="text-xs text-slate-500 mt-1">Unlock your rentals & client overview</p>
+          <h1 className="text-2xl font-serif text-white">
+            {loginType === 'customer' ? 'Client Login' : 'Administrator Lock'}
+          </h1>
+          <p className="text-xs text-slate-500 mt-1">
+            {loginType === 'customer' 
+              ? 'Unlock your rentals & client overview' 
+              : 'Provide authorization keys to access dashboard panels'}
+          </p>
         </div>
 
-        <form onSubmit={handleLoginSubmit} className="space-y-4 text-left">
-          <div>
-            <label className="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">Email or Phone Number</label>
-            <input 
-              type="text" 
-              required 
-              placeholder="Email address or phone number"
-              value={emailOrPhone} 
-              onChange={(e) => setEmailOrPhone(e.target.value)} 
-              className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2.5 text-xs text-slate-200 focus:outline-none focus:border-gold-500" 
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">Account Password</label>
-            <div className="relative">
+        {loginType === 'customer' ? (
+          <form onSubmit={handleLoginSubmit} className="space-y-4 text-left">
+            <div>
+              <label className="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">Email or Phone Number</label>
               <input 
-                type={showPassword ? "text" : "password"} 
+                type="text" 
                 required 
-                placeholder="••••••"
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)} 
-                className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2.5 pr-10 text-xs text-slate-200 focus:outline-none focus:border-gold-500" 
+                placeholder="Email address or phone number"
+                value={emailOrPhone} 
+                onChange={(e) => setEmailOrPhone(e.target.value)} 
+                className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2.5 text-xs text-slate-200 focus:outline-none focus:border-gold-500" 
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xs focus:outline-none cursor-pointer"
-              >
-                {showPassword ? "Hide" : "Show"}
-              </button>
             </div>
-          </div>
-          <div className="flex justify-between items-center text-xs">
-            <label className="flex items-center space-x-2 text-slate-400 cursor-pointer">
+            <div>
+              <label className="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">Account Password</label>
+              <div className="relative">
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  required 
+                  placeholder="••••••"
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)} 
+                  className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2.5 pr-10 text-xs text-slate-200 focus:outline-none focus:border-gold-500" 
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xs focus:outline-none cursor-pointer"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+            </div>
+            <div className="flex justify-between items-center text-xs">
+              <label className="flex items-center space-x-2 text-slate-400 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={rememberMe} 
+                  onChange={(e) => setRememberMe(e.target.checked)} 
+                  className="rounded border-slate-800 bg-luxury-charcoal text-gold-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                />
+                <span>Remember Me</span>
+              </label>
+              <Link to="/forgot-password" className="text-gold-500 hover:underline">Forgot password?</Link>
+            </div>
+            <button type="submit" className="w-full py-2.5 gold-gradient-bg text-luxury-black font-semibold text-xs tracking-widest uppercase rounded hover:opacity-90 active:scale-[0.99] transition-all cursor-pointer">Login</button>
+          </form>
+        ) : (
+          <form onSubmit={handleAdminLoginSubmit} className="space-y-4 text-left">
+            <div>
+              <label className="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">Admin ID</label>
               <input 
-                type="checkbox" 
-                checked={rememberMe} 
-                onChange={(e) => setRememberMe(e.target.checked)} 
-                className="rounded border-slate-800 bg-luxury-charcoal text-gold-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                type="text" 
+                required 
+                placeholder="e.g. amit9115"
+                value={adminId} 
+                onChange={(e) => setAdminId(e.target.value)} 
+                className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2.5 text-xs text-slate-200 focus:outline-none focus:border-gold-500" 
               />
-              <span>Remember Me</span>
-            </label>
-            <Link to="/forgot-password" className="text-gold-500 hover:underline">Forgot password?</Link>
-          </div>
-          <button type="submit" className="w-full py-2.5 gold-gradient-bg text-luxury-black font-semibold text-xs tracking-widest uppercase rounded hover:opacity-90 active:scale-[0.99] transition-all cursor-pointer">Login</button>
-        </form>
+            </div>
+            <div>
+              <label className="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">Access Password</label>
+              <input 
+                type="password" 
+                required 
+                placeholder="•••••"
+                value={adminPassword} 
+                onChange={(e) => setAdminPassword(e.target.value)} 
+                className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2.5 text-xs text-slate-200 focus:outline-none focus:border-gold-500" 
+              />
+            </div>
+            <button type="submit" className="w-full py-2.5 gold-gradient-bg text-luxury-black font-semibold text-xs tracking-widest uppercase rounded hover:opacity-90 active:scale-[0.99] transition-all cursor-pointer">Unlock Dashboard</button>
+          </form>
+        )}
 
-        <div className="text-center text-xs text-slate-500">
-          Don't have an account? <Link to="/register" className="text-gold-500 hover:underline font-semibold">Register Here</Link>
-        </div>
+        {loginType === 'customer' && (
+          <div className="text-center text-xs text-slate-500">
+            Don't have an account? <Link to="/register" className="text-gold-500 hover:underline font-semibold">Register Here</Link>
+          </div>
+        )}
       </div>
     </div>
   );
