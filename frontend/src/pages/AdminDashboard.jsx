@@ -34,8 +34,8 @@ function AdminDashboard() {
   const [newProdRent, setNewProdRent] = useState(50);
   const [newProdDeposit, setNewProdDeposit] = useState(400);
   const [newProdImage, setNewProdImage] = useState('https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=400');
-  const [newProdOccasion, setNewProdOccasion] = useState('');
-  const [newProdFestival, setNewProdFestival] = useState('');
+  const [newProdOccasions, setNewProdOccasions] = useState([]);
+  const [newProdFestivals, setNewProdFestivals] = useState([]);
   const [newProdCulture, setNewProdCulture] = useState('');
 
   // Product Edit State
@@ -49,8 +49,8 @@ function AdminDashboard() {
   const [editProdRent, setEditProdRent] = useState(0);
   const [editProdDeposit, setEditProdDeposit] = useState(0);
   const [editProdImage, setEditProdImage] = useState('');
-  const [editProdOccasion, setEditProdOccasion] = useState('');
-  const [editProdFestival, setEditProdFestival] = useState('');
+  const [editProdOccasions, setEditProdOccasions] = useState([]);
+  const [editProdFestivals, setEditProdFestivals] = useState([]);
   const [editProdCulture, setEditProdCulture] = useState('');
 
   // Settings Form State
@@ -106,8 +106,6 @@ function AdminDashboard() {
       toast.error('Please fill in required fields.');
       return;
     }
-    const occasionsArray = newProdOccasion ? [newProdOccasion] : [];
-    const festivalsArray = newProdFestival ? [newProdFestival] : [];
 
     addProduct({
       name: newProdName,
@@ -119,8 +117,8 @@ function AdminDashboard() {
       dailyRent: Number(newProdRent),
       deposit: Number(newProdDeposit),
       image: newProdImage,
-      occasions: occasionsArray,
-      festivals: festivalsArray,
+      occasions: newProdOccasions,
+      festivals: newProdFestivals,
       culture: newProdCulture
     });
 
@@ -129,8 +127,8 @@ function AdminDashboard() {
     setNewProdDesc('');
     setNewProdMaterial('');
     setNewProdWeight('');
-    setNewProdOccasion('');
-    setNewProdFestival('');
+    setNewProdOccasions([]);
+    setNewProdFestivals([]);
     setNewProdCulture('');
   };
 
@@ -146,8 +144,8 @@ function AdminDashboard() {
     setEditProdRent(prod.dailyRent);
     setEditProdDeposit(prod.deposit);
     setEditProdImage(prod.image);
-    setEditProdOccasion(prod.occasions ? prod.occasions[0] || '' : '');
-    setEditProdFestival(prod.festivals ? prod.festivals[0] || '' : '');
+    setEditProdOccasions(prod.occasions || []);
+    setEditProdFestivals(prod.festivals || []);
     setEditProdCulture(prod.culture || '');
   };
 
@@ -168,8 +166,8 @@ function AdminDashboard() {
       dailyRent: Number(editProdRent),
       deposit: Number(editProdDeposit),
       image: editProdImage,
-      occasions: editProdOccasion ? [editProdOccasion] : [],
-      festivals: editProdFestival ? [editProdFestival] : [],
+      occasions: editProdOccasions,
+      festivals: editProdFestivals,
       culture: editProdCulture
     });
     setEditingProduct(null);
@@ -456,24 +454,54 @@ function AdminDashboard() {
                       <label className="block text-[9px] uppercase tracking-widest text-slate-500 mb-1">Image URL</label>
                       <input type="text" value={newProdImage} onChange={(e) => setNewProdImage(e.target.value)} className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2 text-slate-200 focus:outline-none" />
                     </div>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-[9px] uppercase tracking-widest text-slate-500 mb-1">Occasion</label>
-                        <select value={newProdOccasion} onChange={(e) => setNewProdOccasion(e.target.value)} className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2 text-slate-200 focus:outline-none uppercase">
-                          <option value="">None</option>
-                          {occasions.map((o, idx) => <option key={idx} value={o}>{o}</option>)}
-                        </select>
+                        <label className="block text-[9px] uppercase tracking-widest text-slate-500 mb-1">Occasions (Select Multiple)</label>
+                        <div className="space-y-1 max-h-28 overflow-y-auto border border-slate-800 p-2 rounded bg-luxury-dark/40">
+                          {occasions.map((o) => (
+                            <label key={o} className="flex items-center gap-2 cursor-pointer py-0.5">
+                              <input 
+                                type="checkbox" 
+                                checked={newProdOccasions.includes(o)} 
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setNewProdOccasions(prev => [...prev, o]);
+                                  } else {
+                                    setNewProdOccasions(prev => prev.filter(item => item !== o));
+                                  }
+                                }}
+                                className="rounded border-slate-800 bg-luxury-charcoal text-gold-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                              />
+                              <span className="text-[10px] text-slate-300 uppercase">{o}</span>
+                            </label>
+                          ))}
+                        </div>
                       </div>
                       <div>
-                        <label className="block text-[9px] uppercase tracking-widest text-slate-500 mb-1">Festival</label>
-                        <select value={newProdFestival} onChange={(e) => setNewProdFestival(e.target.value)} className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2 text-slate-200 focus:outline-none uppercase">
-                          <option value="">None</option>
-                          {festivals.map((f, idx) => <option key={idx} value={f}>{f}</option>)}
-                        </select>
+                        <label className="block text-[9px] uppercase tracking-widest text-slate-500 mb-1">Festivals (Select Multiple)</label>
+                        <div className="space-y-1 max-h-28 overflow-y-auto border border-slate-800 p-2 rounded bg-luxury-dark/40">
+                          {festivals.map((f) => (
+                            <label key={f} className="flex items-center gap-2 cursor-pointer py-0.5">
+                              <input 
+                                type="checkbox" 
+                                checked={newProdFestivals.includes(f)} 
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setNewProdFestivals(prev => [...prev, f]);
+                                  } else {
+                                    setNewProdFestivals(prev => prev.filter(item => item !== f));
+                                  }
+                                }}
+                                className="rounded border-slate-800 bg-luxury-charcoal text-gold-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                              />
+                              <span className="text-[10px] text-slate-300 uppercase">{f}</span>
+                            </label>
+                          ))}
+                        </div>
                       </div>
                       <div>
                         <label className="block text-[9px] uppercase tracking-widest text-slate-500 mb-1">Culture</label>
-                        <select value={newProdCulture} onChange={(e) => setNewProdCulture(e.target.value)} className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2 text-slate-200 focus:outline-none uppercase">
+                        <select value={newProdCulture} onChange={(e) => setNewProdCulture(e.target.value)} className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2 text-slate-200 focus:outline-none uppercase h-10">
                           <option value="">None</option>
                           {cultures.map((c, idx) => <option key={idx} value={c}>{c}</option>)}
                         </select>
@@ -529,24 +557,54 @@ function AdminDashboard() {
                       <label className="block text-[9px] uppercase tracking-widest text-slate-500 mb-1">Image URL</label>
                       <input type="text" value={editProdImage} onChange={(e) => setEditProdImage(e.target.value)} className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2 text-slate-200 focus:outline-none" />
                     </div>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-[9px] uppercase tracking-widest text-slate-500 mb-1">Occasion</label>
-                        <select value={editProdOccasion} onChange={(e) => setEditProdOccasion(e.target.value)} className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2 text-slate-200 focus:outline-none uppercase">
-                          <option value="">None</option>
-                          {occasions.map((o, idx) => <option key={idx} value={o}>{o}</option>)}
-                        </select>
+                        <label className="block text-[9px] uppercase tracking-widest text-slate-500 mb-1">Occasions (Select Multiple)</label>
+                        <div className="space-y-1 max-h-28 overflow-y-auto border border-slate-800 p-2 rounded bg-luxury-dark/40">
+                          {occasions.map((o) => (
+                            <label key={o} className="flex items-center gap-2 cursor-pointer py-0.5">
+                              <input 
+                                type="checkbox" 
+                                checked={editProdOccasions.includes(o)} 
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setEditProdOccasions(prev => [...prev, o]);
+                                  } else {
+                                    setEditProdOccasions(prev => prev.filter(item => item !== o));
+                                  }
+                                }}
+                                className="rounded border-slate-800 bg-luxury-charcoal text-gold-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                              />
+                              <span className="text-[10px] text-slate-300 uppercase">{o}</span>
+                            </label>
+                          ))}
+                        </div>
                       </div>
                       <div>
-                        <label className="block text-[9px] uppercase tracking-widest text-slate-500 mb-1">Festival</label>
-                        <select value={editProdFestival} onChange={(e) => setEditProdFestival(e.target.value)} className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2 text-slate-200 focus:outline-none uppercase">
-                          <option value="">None</option>
-                          {festivals.map((f, idx) => <option key={idx} value={f}>{f}</option>)}
-                        </select>
+                        <label className="block text-[9px] uppercase tracking-widest text-slate-500 mb-1">Festivals (Select Multiple)</label>
+                        <div className="space-y-1 max-h-28 overflow-y-auto border border-slate-800 p-2 rounded bg-luxury-dark/40">
+                          {festivals.map((f) => (
+                            <label key={f} className="flex items-center gap-2 cursor-pointer py-0.5">
+                              <input 
+                                type="checkbox" 
+                                checked={editProdFestivals.includes(f)} 
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setEditProdFestivals(prev => [...prev, f]);
+                                  } else {
+                                    setEditProdFestivals(prev => prev.filter(item => item !== f));
+                                  }
+                                }}
+                                className="rounded border-slate-800 bg-luxury-charcoal text-gold-500 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+                              />
+                              <span className="text-[10px] text-slate-300 uppercase">{f}</span>
+                            </label>
+                          ))}
+                        </div>
                       </div>
                       <div>
                         <label className="block text-[9px] uppercase tracking-widest text-slate-500 mb-1">Culture</label>
-                        <select value={editProdCulture} onChange={(e) => setEditProdCulture(e.target.value)} className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2 text-slate-200 focus:outline-none uppercase">
+                        <select value={editProdCulture} onChange={(e) => setEditProdCulture(e.target.value)} className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2 text-slate-200 focus:outline-none uppercase h-10">
                           <option value="">None</option>
                           {cultures.map((c, idx) => <option key={idx} value={c}>{c}</option>)}
                         </select>

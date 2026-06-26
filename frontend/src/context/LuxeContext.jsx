@@ -336,7 +336,7 @@ const INITIAL_PRODUCTS = [
 const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api');
 
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('luxe_token');
+  const token = localStorage.getItem('luxe_accessToken') || sessionStorage.getItem('luxe_accessToken');
   return {
     'Content-Type': 'application/json',
     ...(token ? { 'Authorization': `Bearer ${token}` } : {})
