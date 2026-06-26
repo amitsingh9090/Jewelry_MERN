@@ -679,7 +679,7 @@ export function LuxeProvider({ children }) {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) throw new Error(data.message);
       setCategories(data.config.categories);
       toast.error(`Category ${name} deleted.`);
@@ -696,7 +696,7 @@ export function LuxeProvider({ children }) {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) throw new Error(data.message);
       setFestivals(data.config.festivals);
       toast.error(`Festival tag ${name} deleted.`);
@@ -713,7 +713,7 @@ export function LuxeProvider({ children }) {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) throw new Error(data.message);
       setCultures(data.config.cultures);
       toast.error(`Culture config ${name} deleted.`);
@@ -730,7 +730,7 @@ export function LuxeProvider({ children }) {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) throw new Error(data.message);
       setOccasions(data.config.occasions);
       toast.error(`Occasion ${name} deleted.`);
@@ -749,7 +749,7 @@ export function LuxeProvider({ children }) {
         headers: getAuthHeaders(),
         body: JSON.stringify({ name })
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) throw new Error(data.message);
       setCategories(data.config.categories);
       toast.success(`Category ${name} created.`);
@@ -767,7 +767,7 @@ export function LuxeProvider({ children }) {
         headers: getAuthHeaders(),
         body: JSON.stringify({ name })
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) throw new Error(data.message);
       setFestivals(data.config.festivals);
       toast.success(`Festival tag ${name} created.`);
@@ -785,7 +785,7 @@ export function LuxeProvider({ children }) {
         headers: getAuthHeaders(),
         body: JSON.stringify({ name })
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) throw new Error(data.message);
       setCultures(data.config.cultures);
       toast.success(`Culture config ${name} created.`);
@@ -803,7 +803,7 @@ export function LuxeProvider({ children }) {
         headers: getAuthHeaders(),
         body: JSON.stringify({ name })
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) throw new Error(data.message);
       setOccasions(data.config.occasions);
       toast.success(`Occasion ${name} created.`);
@@ -893,10 +893,10 @@ export function LuxeProvider({ children }) {
       setUser(data.user);
       toast.success(`Welcome back, ${data.user.name}!`);
       fetchUserData(data.accessToken, data.user);
-      return true;
+      return data.user;
     } catch (err) {
       toast.error(err.message || 'Incorrect email or password. Please check and try again.');
-      return false;
+      return null;
     }
   };
 
