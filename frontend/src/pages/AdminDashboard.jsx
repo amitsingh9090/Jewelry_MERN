@@ -13,7 +13,7 @@ function AdminDashboard() {
     addOccasion, deleteOccasion,
     users, toggleAdminAccess,
     adminCredentials, updateAdminCredentials,
-    user
+    user, login, logout
   } = useLuxe();
 
   // Authentication States
@@ -64,26 +64,34 @@ function AdminDashboard() {
   const [newOccName, setNewOccName] = useState('');
 
   // Handle Admin Authentication
-  const handleAdminLogin = (e) => {
+  const handleAdminLogin = async (e) => {
     e.preventDefault();
-    if (
-      adminIdInput === adminCredentials.username && 
-      adminPasswordInput === adminCredentials.password
-    ) {
-      setIsAdminAuthenticated(true);
-      toast.success('Admin Dashboard unlocked.');
-    } else {
-      const foundUser = users.find(u => 
-        (u.email.toLowerCase() === adminIdInput.toLowerCase() || u.name.toLowerCase() === adminIdInput.toLowerCase()) && 
-        u.password === adminPasswordInput && 
-        u.hasAdminAccess
-      );
-      if (foundUser) {
-        setIsAdminAuthenticated(true);
-        toast.success(`Admin Dashboard unlocked as ${foundUser.name}.`);
+    try {
+      let loggedInUser = null;
+      if (
+        adminIdInput === adminCredentials.username && 
+        adminPasswordInput === adminCredentials.password
+      ) {
+        // Silently authenticate with the backend admin user to get the JWT
+        loggedInUser = await login('amit@example.com', 'password123');
       } else {
-        toast.error('Invalid Administrator credentials.');
+        // Try authenticating as a database user with the provided credentials
+        loggedInUser = await login(adminIdInput, adminPasswordInput);
       }
+
+      if (loggedInUser && loggedInUser.hasAdminAccess) {
+        setIsAdminAuthenticated(true);
+        toast.success(`Admin Dashboard unlocked as ${loggedInUser.name}.`);
+      } else {
+        if (loggedInUser) {
+          await logout();
+          toast.error('This user does not have Administrator privileges.');
+        } else {
+          toast.error('Invalid Administrator credentials.');
+        }
+      }
+    } catch (err) {
+      toast.error('Authentication failed. Backend may be offline.');
     }
   };
 
