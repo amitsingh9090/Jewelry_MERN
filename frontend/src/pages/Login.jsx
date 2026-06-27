@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 function Login() {
-  const { login, logout, user, orders, tickets, addTicket, updateUserProfile, adminCredentials } = useLuxe();
+  const { login, logout, user, orders, tickets, addTicket, updateUserProfile, adminCredentials, wishlist, products, toggleWishlist, addToCart, returnOrder } = useLuxe();
   const navigate = useNavigate();
   
   // Tab-based login mode: 'customer' or 'admin'
@@ -29,6 +29,9 @@ function Login() {
   // Support ticket form
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+
+  // Profile Dashboard Active Tab: 'rentals', 'wishlist', 'billing', 'support'
+  const [activeProfileTab, setActiveProfileTab] = useState('rentals');
  
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -115,50 +118,62 @@ function Login() {
   }, [userOrders]);
 
   if (user) {
+    // Get wishlisted products details
+    const wishlistedProducts = products.filter(p => wishlist.includes(p.id));
+
     return (
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Left Side: Profile overview & Edit */}
-        <div className="lg:col-span-4 glass-panel p-6 rounded-xl space-y-4">
+        <div className="lg:col-span-4 glass-panel p-6 rounded-2xl border border-slate-900 space-y-5">
           <div className="text-center space-y-2">
-            <img src={user.avatar} className="w-24 h-24 rounded-full mx-auto border-2 border-gold-500" alt="" />
+            <img src={user.avatar} className="w-24 h-24 rounded-full mx-auto border-2 border-gold-500 shadow-xl" alt="" />
             <div>
               <h2 className="text-xl font-serif text-white">{user.name}</h2>
-              <p className="text-[10px] text-luxury-gold uppercase tracking-widest">Luxe Member</p>
+              <p className="text-[10px] text-luxury-gold uppercase tracking-widest font-semibold">Prestige Club Patron</p>
             </div>
           </div>
 
           {!isEditing ? (
-            <div className="space-y-4 pt-4 border-t border-slate-800">
-              <div className="text-left text-xs text-slate-400 space-y-2.5">
-                <div><span className="text-slate-500 block text-[10px] uppercase tracking-wider">Email Address</span> <strong className="text-white font-normal">{user.email}</strong></div>
-                <div><span className="text-slate-500 block text-[10px] uppercase tracking-wider">Phone Contact</span> <strong className="text-white font-normal">{user.phone}</strong></div>
-                <div><span className="text-slate-500 block text-[10px] uppercase tracking-wider">Shipping Address</span> <strong className="text-white font-normal">{user.address}</strong></div>
+            <div className="space-y-4 pt-4 border-t border-slate-900/60">
+              <div className="text-left text-xs text-slate-400 space-y-3">
+                <div>
+                  <span className="text-slate-500 block text-[9px] uppercase tracking-wider mb-0.5">Email Address</span>
+                  <strong className="text-slate-200 font-normal">{user.email}</strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[9px] uppercase tracking-wider mb-0.5">Phone Contact</span>
+                  <strong className="text-slate-200 font-normal">{user.phone || 'Not configured'}</strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[9px] uppercase tracking-wider mb-0.5">Shipping Vault Address</span>
+                  <strong className="text-slate-200 font-normal">{user.address || 'Not configured'}</strong>
+                </div>
               </div>
               {user.hasAdminAccess && (
                 <Link 
                   to="/admin" 
-                  className="block w-full py-2.5 text-center bg-gold-500 text-luxury-black font-bold text-xs uppercase tracking-widest rounded shadow-md hover:opacity-90 active:scale-[0.98] transition-all"
+                  className="block w-full py-2.5 text-center bg-gold-500 text-luxury-black font-bold text-xs uppercase tracking-widest rounded-lg shadow-md hover:opacity-90 active:scale-[0.98] transition-all"
                 >
-                  Enter Admin Panel
+                  Enter Admin Dashboard
                 </Link>
               )}
               <button 
                 onClick={startEditing} 
-                className="w-full py-2 bg-gold-500/10 border border-gold-500/20 text-gold-300 text-xs font-semibold rounded uppercase tracking-wider hover:bg-gold-500/20 transition-all cursor-pointer"
+                className="w-full py-2.5 bg-gold-500/10 border border-gold-500/20 text-gold-300 text-xs font-semibold rounded-lg uppercase tracking-wider hover:bg-gold-500/25 transition-all cursor-pointer"
               >
-                Edit Information
+                Edit Account Information
               </button>
             </div>
           ) : (
-            <form onSubmit={handleEditSubmit} className="space-y-4 pt-4 border-t border-slate-800 text-left">
+            <form onSubmit={handleEditSubmit} className="space-y-4 pt-4 border-t border-slate-900/60 text-left">
               <div>
                 <label className="block text-[9px] text-slate-500 uppercase tracking-widest mb-1">Full Name</label>
                 <input 
                   type="text" 
                   value={editName} 
                   onChange={(e) => setEditName(e.target.value)} 
-                  className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2 text-xs text-slate-200 focus:outline-none"
+                  className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2 text-xs text-slate-200 focus:outline-none focus:border-gold-500"
                 />
               </div>
               <div>
@@ -167,7 +182,7 @@ function Login() {
                   type="text" 
                   value={editPhone} 
                   onChange={(e) => setEditPhone(e.target.value)} 
-                  className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2 text-xs text-slate-200 focus:outline-none"
+                  className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2 text-xs text-slate-200 focus:outline-none focus:border-gold-500"
                 />
               </div>
               <div>
@@ -176,7 +191,7 @@ function Login() {
                   value={editAddress} 
                   onChange={(e) => setEditAddress(e.target.value)} 
                   rows="2"
-                  className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2 text-xs text-slate-200 focus:outline-none"
+                  className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2 text-xs text-slate-200 focus:outline-none focus:border-gold-500"
                 ></textarea>
               </div>
               <div className="flex gap-2">
@@ -186,98 +201,282 @@ function Login() {
             </form>
           )}
 
-          <button onClick={logout} className="w-full py-2 bg-rose-950/20 border border-rose-500/20 text-rose-400 text-xs font-semibold rounded uppercase tracking-wider hover:bg-rose-900/10 cursor-pointer">Logout</button>
+          <button onClick={logout} className="w-full py-2.5 bg-rose-950/15 border border-rose-500/20 text-rose-400 text-xs font-semibold rounded-lg uppercase tracking-wider hover:bg-rose-950/25 transition-all cursor-pointer">Logout Session</button>
         </div>
 
-        {/* Right Side: Orders and Support Tickets */}
+        {/* Right Side: Tabbed Patron Portal */}
         <div className="lg:col-span-8 space-y-6">
           
-          {/* Active Bookings */}
-          <div className="glass-panel p-6 rounded-xl space-y-4">
-            <h3 className="text-lg font-serif text-white border-b border-slate-900 pb-2">Active Vault Rentals</h3>
-            {activeRentals.length === 0 ? (
-              <p className="text-xs text-slate-500 font-light py-2">No active rentals currently booked.</p>
-            ) : (
-              <div className="space-y-4">
-                {activeRentals.map((ord) => (
-                  <div key={ord.id} className="p-4 border border-slate-800 rounded-lg text-xs space-y-2">
-                    <div className="flex justify-between items-center text-slate-300 font-medium">
-                      <span>Order Reference: <strong>{ord.id}</strong></span>
-                      <span className="px-2 py-0.5 rounded bg-gold-950/20 text-luxury-gold border border-gold-500/20">{ord.status}</span>
-                    </div>
-                    <div className="text-slate-500">Date Placed: {ord.date}</div>
-                    <div className="space-y-1">
-                      {ord.items.map((i, idx) => (
-                        <div key={idx} className="flex justify-between text-slate-400">
-                          <span>{i.name} (x{i.qty || 1}) - {i.days || 3} days</span>
-                          <span>${i.dailyRent * (i.days || 3) * (i.qty || 1)}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex justify-between font-bold text-white border-t border-slate-900 pt-2 text-sm">
-                      <span>Total Invoice</span>
-                      <span>${ord.total}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+          {/* Tab Navigation */}
+          <div className="flex border-b border-slate-900 gap-6 text-xs uppercase tracking-widest font-semibold pb-1 overflow-x-auto">
+            <button 
+              onClick={() => setActiveProfileTab('rentals')}
+              className={`pb-2.5 transition-all cursor-pointer border-b-2 ${activeProfileTab === 'rentals' ? 'text-luxury-gold border-luxury-gold' : 'text-slate-500 border-transparent hover:text-slate-300'}`}
+            >
+              Rentals Dashboard
+            </button>
+            <button 
+              onClick={() => setActiveProfileTab('wishlist')}
+              className={`pb-2.5 transition-all cursor-pointer border-b-2 ${activeProfileTab === 'wishlist' ? 'text-luxury-gold border-luxury-gold' : 'text-slate-500 border-transparent hover:text-slate-300'}`}
+            >
+              Wishlist Vault
+            </button>
+            <button 
+              onClick={() => setActiveProfileTab('billing')}
+              className={`pb-2.5 transition-all cursor-pointer border-b-2 ${activeProfileTab === 'billing' ? 'text-luxury-gold border-luxury-gold' : 'text-slate-500 border-transparent hover:text-slate-300'}`}
+            >
+              Invoices & Payments
+            </button>
+            <button 
+              onClick={() => setActiveProfileTab('support')}
+              className={`pb-2.5 transition-all cursor-pointer border-b-2 ${activeProfileTab === 'support' ? 'text-luxury-gold border-luxury-gold' : 'text-slate-500 border-transparent hover:text-slate-300'}`}
+            >
+              Patron Support
+            </button>
           </div>
 
-          {/* Past Rental History */}
-          <div className="glass-panel p-6 rounded-xl space-y-4">
-            <h3 className="text-lg font-serif text-white border-b border-slate-900 pb-2">Rental History</h3>
-            {returnedRentals.length === 0 ? (
-              <p className="text-xs text-slate-500 font-light py-2">No past rentals recorded.</p>
-            ) : (
-              <div className="space-y-4">
-                {returnedRentals.map((ord) => (
-                  <div key={ord.id} className="p-4 border border-slate-800 rounded-lg text-xs space-y-2 opacity-75">
-                    <div className="flex justify-between items-center text-slate-400 font-medium">
-                      <span>Order Reference: <strong>{ord.id}</strong></span>
-                      <span className="px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-800">{ord.status}</span>
-                    </div>
-                    <div className="text-slate-500">Date Returned: {ord.date}</div>
-                    <div className="space-y-1">
-                      {ord.items.map((i, idx) => (
-                        <div key={idx} className="flex justify-between text-slate-400">
-                          <span>{i.name} (x{i.qty || 1}) - {i.days || 3} days</span>
-                          <span>${i.dailyRent * (i.days || 3) * (i.qty || 1)}</span>
+          {/* Tab Panels */}
+          {activeProfileTab === 'rentals' && (
+            <div className="space-y-6 animate-fadeIn">
+              {/* Active Bookings */}
+              <div className="glass-panel p-6 rounded-2xl border border-slate-900 space-y-4">
+                <h3 className="text-base font-serif text-white flex justify-between items-center">
+                  <span>Active Vault Rentals</span>
+                  <span className="text-[10px] text-luxury-gold bg-gold-950/20 border border-gold-500/10 px-2 py-0.5 rounded-full uppercase tracking-wider">{activeRentals.length} active</span>
+                </h3>
+                {activeRentals.length === 0 ? (
+                  <p className="text-xs text-slate-500 font-light py-4">No active rentals currently booked.</p>
+                ) : (
+                  <div className="space-y-6">
+                    {activeRentals.map((ord) => (
+                      <div key={ord.id} className="p-4 border border-slate-800 rounded-xl text-xs space-y-4 bg-luxury-charcoal/15">
+                        <div className="flex justify-between items-center text-slate-300 font-medium">
+                          <span>Ref: <strong>{ord.orderId || ord.id}</strong></span>
+                          <div className="flex items-center gap-3">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-gold-950/20 text-luxury-gold border border-gold-500/20">{ord.status}</span>
+                            <button 
+                              onClick={() => returnOrder(ord.orderId || ord.id)}
+                              className="px-3 py-1 bg-luxury-gold hover:bg-gold-600 text-luxury-black font-semibold text-[10px] uppercase rounded transition-all"
+                            >
+                              Request Return
+                            </button>
+                          </div>
                         </div>
-                      ))}
-                    </div>
-                    <div className="flex justify-between font-bold text-white border-t border-slate-900 pt-2 text-sm">
-                      <span>Total Returned Invoice</span>
-                      <span>${ord.total}</span>
-                    </div>
+                        
+                        <div className="space-y-3 pt-2">
+                          {ord.items.map((i, idx) => {
+                            const matchItem = products.find(p => String(p.id) === String(i.productId));
+                            return (
+                              <div key={idx} className="flex items-center gap-3 justify-between text-slate-400 border-b border-slate-900/50 pb-2">
+                                <div className="flex items-center gap-3">
+                                  {matchItem?.image && (
+                                    <img src={matchItem.image} alt="" className="w-8 h-8 rounded object-cover border border-slate-800" />
+                                  )}
+                                  <div>
+                                    <span className="text-slate-200 block font-medium">{i.name}</span>
+                                    <span className="text-[10px] text-slate-500">{i.days || 3} days rental • Qty {i.qty || 1}</span>
+                                  </div>
+                                </div>
+                                <span className="text-slate-200 font-semibold">${i.dailyRent * (i.days || 3) * (i.qty || 1)}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="flex justify-between font-bold text-white pt-2 text-sm">
+                          <span>Grand Total Paid</span>
+                          <span className="text-luxury-gold">${ord.total}</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
-            )}
-          </div>
 
-          {/* Support Tickets Section */}
-          <div className="glass-panel p-6 rounded-xl space-y-6">
-            <h3 className="text-lg font-serif text-white border-b border-slate-900 pb-2">Support Tickets</h3>
-            <div className="space-y-3">
-              {tickets.map((t) => (
-                <div key={t.id} className="p-3 border border-slate-800 rounded bg-luxury-dark/40 flex justify-between items-center text-xs">
-                  <div>
-                    <div className="font-semibold text-white">{t.subject}</div>
-                    <div className="text-slate-500">{t.message}</div>
+              {/* Past Rental History */}
+              <div className="glass-panel p-6 rounded-2xl border border-slate-900 space-y-4">
+                <h3 className="text-base font-serif text-white">Rental History</h3>
+                {returnedRentals.length === 0 ? (
+                  <p className="text-xs text-slate-500 font-light py-4">No past rentals recorded.</p>
+                ) : (
+                  <div className="space-y-4">
+                    {returnedRentals.map((ord) => (
+                      <div key={ord.id} className="p-4 border border-slate-900 rounded-xl text-xs space-y-3 bg-luxury-dark/40 opacity-80">
+                        <div className="flex justify-between items-center text-slate-400 font-medium">
+                          <span>Ref: <strong>{ord.orderId || ord.id}</strong></span>
+                          <span className="px-2 py-0.5 rounded text-[10px] bg-slate-900 text-slate-400 border border-slate-800">{ord.status}</span>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          {ord.items.map((i, idx) => {
+                            const matchItem = products.find(p => String(p.id) === String(i.productId));
+                            return (
+                              <div key={idx} className="flex justify-between items-center text-slate-400">
+                                <div className="flex items-center gap-2">
+                                  {matchItem?.image && (
+                                    <img src={matchItem.image} alt="" className="w-6 h-6 rounded object-cover" />
+                                  )}
+                                  <span>{i.name} (x{i.qty || 1})</span>
+                                </div>
+                                <span>${i.dailyRent * (i.days || 3) * (i.qty || 1)}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="flex justify-between font-semibold text-slate-300 border-t border-slate-900/60 pt-2">
+                          <span>Total Invoiced</span>
+                          <span>${ord.total}</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400">{t.status}</span>
-                </div>
-              ))}
+                )}
+              </div>
             </div>
+          )}
 
-            <form onSubmit={handleSupportSubmit} className="space-y-3 border-t border-slate-900 pt-4 text-left">
-              <h4 className="text-xs font-serif text-white uppercase tracking-widest">New Support Request</h4>
-              <input type="text" placeholder="Subject" value={subject} onChange={(e) => setSubject(e.target.value)} required className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2 text-xs text-slate-300 focus:outline-none" />
-              <textarea placeholder="Describe your request..." value={message} onChange={(e) => setMessage(e.target.value)} required rows="2" className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2 text-xs text-slate-300 focus:outline-none"></textarea>
-              <button type="submit" className="px-4 py-2 border border-gold-500/30 text-xs text-gold-300 rounded hover:bg-gold-500/10 cursor-pointer">Submit Ticket</button>
-            </form>
-          </div>
+          {activeProfileTab === 'wishlist' && (
+            <div className="glass-panel p-6 rounded-2xl border border-slate-900 space-y-4 animate-fadeIn">
+              <h3 className="text-base font-serif text-white border-b border-slate-900 pb-2">Your Wishlist Vault</h3>
+              {wishlistedProducts.length === 0 ? (
+                <div className="text-center py-10 space-y-3">
+                  <p className="text-xs text-slate-500 font-light">No masterpieces added to your wishlist yet.</p>
+                  <Link to="/collections" className="inline-block text-[10px] font-semibold text-luxury-gold uppercase tracking-wider hover:underline">
+                    Browse Collections →
+                  </Link>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {wishlistedProducts.map((p) => (
+                    <div key={p.id} className="p-3 border border-slate-800 rounded-xl bg-luxury-charcoal/10 flex gap-3 items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <img src={p.image} alt="" className="w-12 h-12 rounded object-cover border border-slate-800" />
+                        <div>
+                          <h4 className="text-xs font-serif text-white font-medium">{p.name}</h4>
+                          <span className="text-[10px] text-luxury-gold">${p.dailyRent}/day</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={() => addToCart(p, 1)}
+                          className="px-2.5 py-1.5 gold-gradient-bg text-luxury-black font-semibold text-[9px] uppercase tracking-wider rounded"
+                        >
+                          Rent
+                        </button>
+                        <button 
+                          onClick={() => toggleWishlist(p.id)}
+                          className="p-1.5 border border-slate-800 hover:border-red-500/30 text-slate-400 hover:text-red-400 rounded transition-colors"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 11-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeProfileTab === 'billing' && (
+            <div className="glass-panel p-6 rounded-2xl border border-slate-900 space-y-4 animate-fadeIn">
+              <h3 className="text-base font-serif text-white border-b border-slate-900 pb-2">Patron Invoice Ledger</h3>
+              
+              {userOrders.length === 0 ? (
+                <p className="text-xs text-slate-500 font-light py-4">No payment transactions recorded.</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-slate-900 text-slate-500 text-[10px] uppercase tracking-wider">
+                        <th className="pb-3 font-normal">Date</th>
+                        <th className="pb-3 font-normal">Invoice ID</th>
+                        <th className="pb-3 font-normal">Vault Details</th>
+                        <th className="pb-3 font-normal">Paid</th>
+                        <th className="pb-3 font-normal">Security Deposit Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-900/40 text-slate-300">
+                      {userOrders.map((ord) => {
+                        const itemsSummary = ord.items.map(i => `${i.name} (x${i.qty || 1})`).join(', ');
+                        
+                        return (
+                          <tr key={ord.id} className="hover:bg-luxury-charcoal/5">
+                            <td className="py-3.5 pr-2 whitespace-nowrap text-slate-400 font-light">{ord.date}</td>
+                            <td className="py-3.5 pr-2 font-mono font-medium text-white">{ord.orderId || ord.id.substring(0, 8).toUpperCase()}</td>
+                            <td className="py-3.5 pr-2 max-w-[180px] truncate font-light text-slate-400" title={itemsSummary}>{itemsSummary}</td>
+                            <td className="py-3.5 pr-2 text-white font-semibold">${ord.total}</td>
+                            <td className="py-3.5">
+                              {ord.status === 'Active' ? (
+                                <span className="inline-block px-2 py-0.5 rounded text-[9px] font-semibold bg-gold-950/20 text-luxury-gold border border-gold-500/10">Held (Active Bond)</span>
+                              ) : ord.status === 'Returned' ? (
+                                <span className="inline-block px-2 py-0.5 rounded text-[9px] font-semibold bg-emerald-950/20 text-emerald-400 border border-emerald-500/10">Refunded (Released)</span>
+                              ) : (
+                                <span className="inline-block px-2 py-0.5 rounded text-[9px] font-semibold bg-rose-950/20 text-rose-400 border border-rose-500/10">Deducted (Damaged Claim)</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeProfileTab === 'support' && (
+            <div className="glass-panel p-6 rounded-2xl border border-slate-900 space-y-6 animate-fadeIn">
+              <h3 className="text-base font-serif text-white border-b border-slate-900 pb-2">Patron Support Desk</h3>
+              
+              {tickets.length > 0 && (
+                <div className="space-y-3">
+                  {tickets.map((t) => (
+                    <div key={t.id} className="p-3.5 border border-slate-800 rounded-xl bg-luxury-dark/40 flex justify-between items-center text-xs">
+                      <div>
+                        <div className="font-semibold text-white flex items-center gap-2">
+                          <span>{t.subject}</span>
+                          <span className="text-[8px] font-mono bg-slate-900 px-1.5 py-0.5 text-slate-500 rounded">{t.id}</span>
+                        </div>
+                        <div className="text-slate-400 font-light mt-1">{t.message}</div>
+                      </div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-luxury-gold px-2 py-0.5 rounded bg-gold-950/20 border border-gold-500/10">{t.status}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <form onSubmit={handleSupportSubmit} className="space-y-4 border-t border-slate-900 pt-4 text-left">
+                <h4 className="text-xs font-serif text-white uppercase tracking-widest font-semibold">New Support Request</h4>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-[9px] text-slate-500 uppercase tracking-widest mb-1">Subject</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. Reschedule pick-up time, Adjust fitment" 
+                      value={subject} 
+                      onChange={(e) => setSubject(e.target.value)} 
+                      required 
+                      className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2.5 text-xs text-slate-200 focus:outline-none focus:border-gold-500" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] text-slate-500 uppercase tracking-widest mb-1">Detailed Message</label>
+                    <textarea 
+                      placeholder="Describe your request..." 
+                      value={message} 
+                      onChange={(e) => setMessage(e.target.value)} 
+                      required 
+                      rows="3" 
+                      className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2.5 text-xs text-slate-200 focus:outline-none focus:border-gold-500"
+                    ></textarea>
+                  </div>
+                </div>
+                <button type="submit" className="px-5 py-2.5 border border-gold-500/20 text-xs text-gold-300 rounded-lg hover:bg-gold-500/10 transition-all cursor-pointer font-semibold uppercase tracking-wider font-semibold uppercase tracking-wider">Submit Ticket</button>
+              </form>
+            </div>
+          )}
 
         </div>
       </div>
@@ -330,7 +529,7 @@ function Login() {
             <div>
               <label className="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">Email or Phone Number</label>
               <input 
-                type="text" 
+                type="email" 
                 required 
                 placeholder="Email address or phone number"
                 value={emailOrPhone} 

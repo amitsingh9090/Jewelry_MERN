@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const LuxeContext = createContext();
@@ -364,6 +365,7 @@ const safeJson = async (res) => {
 };
 
 export function LuxeProvider({ children }) {
+  const navigate = useNavigate();
   let logout;
   const originalFetch = window.fetch;
   
@@ -827,6 +829,12 @@ export function LuxeProvider({ children }) {
 
   // Cart operations
   const addToCart = (product, qty = 1, start = '', end = '') => {
+    if (!user) {
+      toast.error('Please sign in to rent this jewelry.');
+      navigate('/login');
+      return;
+    }
+
     setCart((prev) => {
       const existing = prev.find(item => item.product.id === product.id);
       const defaultStart = start || new Date().toISOString().split('T')[0];
@@ -842,6 +850,7 @@ export function LuxeProvider({ children }) {
       return [...prev, { product, qty, startDate: defaultStart, endDate: defaultEnd }];
     });
     toast.success(`${product.name} has been added to your cart!`);
+    navigate('/checkout');
   };
 
   const removeFromCart = (productId) => {
@@ -854,6 +863,16 @@ export function LuxeProvider({ children }) {
       prev.map(item =>
         item.product.id === productId
           ? { ...item, qty: Math.max(1, qty) }
+          : item
+      )
+    );
+  };
+
+  const updateCartItem = (productId, updatedFields) => {
+    setCart((prev) =>
+      prev.map(item =>
+        item.product.id === productId
+          ? { ...item, ...updatedFields }
           : item
       )
     );
@@ -1112,6 +1131,7 @@ export function LuxeProvider({ children }) {
       addToCart,
       removeFromCart,
       updateCartQty,
+      updateCartItem,
       clearCart,
       toggleWishlist,
       login,

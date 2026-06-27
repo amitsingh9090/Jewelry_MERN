@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
 // Layout components
 import Header from './components/Header.jsx';
@@ -35,13 +35,13 @@ import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
-    <BrowserRouter>
+    <>
       <Toaster position="bottom-right" reverseOrder={false} />
       <div className="min-h-screen bg-luxury-black text-slate-100 flex flex-col font-sans">
         {/* Navigation Header */}
         <Header />
 
-        {/* Content routing block */}
+        {/* Dynamic Route Content */}
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
@@ -67,7 +67,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/otp-verification" element={<OtpVerification />} />
+            <Route path="/verify-otp" element={<OtpVerification />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/faq" element={<Faqs />} />
@@ -83,7 +83,7 @@ function App() {
         {/* Brand Footer */}
         <Footer />
       </div>
-    </BrowserRouter>
+    </>
   );
 }
 
