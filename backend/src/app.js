@@ -27,7 +27,17 @@ app.use(helmet());
 
 // Enable CORS
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // In development mode, allow requests from any local network origins (for testing on different devices)
+    if (!origin || process.env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+    const allowedOrigins = [process.env.FRONTEND_URL || 'http://localhost:5173'];
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 
