@@ -379,7 +379,7 @@ function Login() {
               <input 
                 type="text" 
                 required 
-                placeholder="e.g. amit9115"
+                placeholder="enter the admin id"
                 value={adminId} 
                 onChange={(e) => setAdminId(e.target.value)} 
                 className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2.5 text-xs text-slate-200 focus:outline-none focus:border-gold-500" 
@@ -390,7 +390,7 @@ function Login() {
               <input 
                 type="password" 
                 required 
-                placeholder="•••••"
+                placeholder="enter the access password"
                 value={adminPassword} 
                 onChange={(e) => setAdminPassword(e.target.value)} 
                 className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2.5 text-xs text-slate-200 focus:outline-none focus:border-gold-500" 
