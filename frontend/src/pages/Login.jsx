@@ -25,6 +25,7 @@ function Login() {
   const [editName, setEditName] = useState('');
   const [editPhone, setEditPhone] = useState('');
   const [editAddress, setEditAddress] = useState('');
+  const [editAvatar, setEditAvatar] = useState('');
  
   // Support ticket form
   const [subject, setSubject] = useState('');
@@ -91,7 +92,8 @@ function Login() {
     updateUserProfile(user.email, {
       name: editName,
       phone: editPhone,
-      address: editAddress
+      address: editAddress,
+      avatar: editAvatar
     });
     setIsEditing(false);
   };
@@ -100,6 +102,7 @@ function Login() {
     setEditName(user.name);
     setEditPhone(user.phone || '');
     setEditAddress(user.address || '');
+    setEditAvatar(user.avatar || '');
     setIsEditing(true);
   };
 
@@ -126,8 +129,17 @@ function Login() {
         
         {/* Left Side: Profile overview & Edit */}
         <div className="lg:col-span-4 glass-panel p-6 rounded-2xl border border-slate-900 space-y-5">
-          <div className="text-center space-y-2">
-            <img src={user.avatar} className="w-24 h-24 rounded-full mx-auto border-2 border-gold-500 shadow-xl" alt="" />
+          <div className="text-center space-y-2 relative group">
+            <div className="relative w-24 h-24 mx-auto">
+              <img src={user.avatar} className="w-24 h-24 rounded-full object-cover border-2 border-gold-500 shadow-xl" alt="" />
+              <button 
+                onClick={startEditing} 
+                className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer focus:outline-none"
+                title="Edit Profile Photo & Details"
+              >
+                <span className="text-[10px] text-luxury-gold uppercase tracking-wider font-semibold">Edit</span>
+              </button>
+            </div>
             <div>
               <h2 className="text-xl font-serif text-white">{user.name}</h2>
               <p className="text-[10px] text-luxury-gold uppercase tracking-widest font-semibold">Prestige Club Patron</p>
@@ -167,6 +179,32 @@ function Login() {
             </div>
           ) : (
             <form onSubmit={handleEditSubmit} className="space-y-4 pt-4 border-t border-slate-900/60 text-left">
+              {/* Photo Uploader */}
+              <div className="flex items-center gap-4 bg-luxury-charcoal/20 p-3 rounded-xl border border-slate-800/80 mb-3">
+                <img src={editAvatar} className="w-14 h-14 rounded-full object-cover border border-gold-500/20 bg-luxury-dark" alt="Avatar Preview" />
+                <div className="flex-grow space-y-1">
+                  <label className="block text-[9px] text-slate-500 uppercase tracking-widest">Profile Photo</label>
+                  <label className="inline-block px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-[10px] text-luxury-gold font-semibold uppercase rounded tracking-wider border border-gold-500/10 hover:border-gold-500/30 cursor-pointer transition-all">
+                    Choose Image File
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            setEditAvatar(reader.result); // Base64 representation
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="hidden" 
+                    />
+                  </label>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-[9px] text-slate-500 uppercase tracking-widest mb-1">Full Name</label>
                 <input 

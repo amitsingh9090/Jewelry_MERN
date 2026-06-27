@@ -356,13 +356,14 @@ router.get('/profile', protect, async (req, res) => {
 // 8. UPDATE PROFILE
 router.put('/profile', protect, async (req, res) => {
   try {
-    const { name, phone, address } = req.body;
+    const { name, phone, address, avatar } = req.body;
     const updatedUser = await prisma.user.update({
       where: { id: req.user.id },
       data: {
         name: name || req.user.name,
         phone: phone !== undefined ? phone : req.user.phone,
-        address: address !== undefined ? address : req.user.address
+        address: address !== undefined ? address : req.user.address,
+        avatar: avatar !== undefined ? avatar : req.user.avatar
       }
     });
 
