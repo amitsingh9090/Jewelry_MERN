@@ -28,14 +28,26 @@ app.use(helmet());
 // Enable CORS
 app.use(cors({
   origin: (origin, callback) => {
-    // In development mode, allow requests from any local network origins (for testing on different devices)
-    if (!origin || process.env.NODE_ENV === 'development') {
+    if (!origin) {
       return callback(null, true);
     }
-    const allowedOrigins = [process.env.FRONTEND_URL || 'http://localhost:5173'];
-    if (allowedOrigins.includes(origin)) {
+    
+    const isDev = process.env.NODE_ENV === 'development';
+    const isVercel = origin.endsWith('.vercel.app');
+    
+    const allowedOrigins = [
+      process.env.FRONTEND_URL,
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'http://localhost:5175'
+    ].filter(Boolean);
+    
+    const isAllowed = allowedOrigins.some(allowed => origin.toLowerCase() === allowed.toLowerCase());
+    
+    if (isDev || isVercel || isAllowed) {
       return callback(null, true);
     }
+    
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true
