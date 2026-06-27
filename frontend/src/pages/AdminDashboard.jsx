@@ -24,6 +24,9 @@ function AdminDashboard() {
   // Tab State
   const [activeTab, setActiveTab] = useState('analytics');
 
+  // Stats Detail Modal State: 'revenue', 'rentals', 'clients', 'catalog', or null
+  const [selectedStatDetail, setSelectedStatDetail] = useState(null);
+
   // Product Add Form State
   const [newProdName, setNewProdName] = useState('');
   const [newProdCategory, setNewProdCategory] = useState(categories[0] || 'Premium Jewelry');
@@ -301,23 +304,242 @@ function AdminDashboard() {
 
       {/* Analytics Counter Widgets */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="glass-panel p-5 rounded-xl border border-slate-800/80 text-left">
-          <span className="text-[9px] text-slate-500 uppercase tracking-widest">Total Revenue</span>
+        <button 
+          onClick={() => setSelectedStatDetail(selectedStatDetail === 'revenue' ? null : 'revenue')}
+          className={`glass-panel p-5 rounded-xl border text-left cursor-pointer transition-all focus:outline-none ${
+            selectedStatDetail === 'revenue' ? 'border-luxury-gold shadow-gold-500/5 shadow-lg' : 'border-slate-800/80 hover:border-gold-500/30'
+          }`}
+        >
+          <span className="text-[9px] text-slate-500 uppercase tracking-widest block">Total Revenue</span>
           <h4 className="text-2xl font-serif text-white mt-1">${stats.revenue}</h4>
-        </div>
-        <div className="glass-panel p-5 rounded-xl border border-slate-800/80 text-left">
-          <span className="text-[9px] text-slate-500 uppercase tracking-widest">Active Rentals</span>
+          <span className="text-[8px] text-luxury-gold mt-1 block font-semibold">🔍 Click for breakdown</span>
+        </button>
+
+        <button 
+          onClick={() => setSelectedStatDetail(selectedStatDetail === 'rentals' ? null : 'rentals')}
+          className={`glass-panel p-5 rounded-xl border text-left cursor-pointer transition-all focus:outline-none ${
+            selectedStatDetail === 'rentals' ? 'border-luxury-gold shadow-gold-500/5 shadow-lg' : 'border-slate-800/80 hover:border-gold-500/30'
+          }`}
+        >
+          <span className="text-[9px] text-slate-500 uppercase tracking-widest block">Active Rentals</span>
           <h4 className="text-2xl font-serif text-white mt-1">{stats.activeRentals}</h4>
-        </div>
-        <div className="glass-panel p-5 rounded-xl border border-slate-800/80 text-left">
-          <span className="text-[9px] text-slate-500 uppercase tracking-widest">Registered Clients</span>
+          <span className="text-[8px] text-luxury-gold mt-1 block font-semibold">🔍 Click for active list</span>
+        </button>
+
+        <button 
+          onClick={() => setSelectedStatDetail(selectedStatDetail === 'clients' ? null : 'clients')}
+          className={`glass-panel p-5 rounded-xl border text-left cursor-pointer transition-all focus:outline-none ${
+            selectedStatDetail === 'clients' ? 'border-luxury-gold shadow-gold-500/5 shadow-lg' : 'border-slate-800/80 hover:border-gold-500/30'
+          }`}
+        >
+          <span className="text-[9px] text-slate-500 uppercase tracking-widest block">Registered Clients</span>
           <h4 className="text-2xl font-serif text-white mt-1">{stats.totalUsers}</h4>
-        </div>
-        <div className="glass-panel p-5 rounded-xl border border-slate-800/80 text-left">
-          <span className="text-[9px] text-slate-500 uppercase tracking-widest">Vault Catalog</span>
+          <span className="text-[8px] text-luxury-gold mt-1 block font-semibold">🔍 Click for clients</span>
+        </button>
+
+        <button 
+          onClick={() => setSelectedStatDetail(selectedStatDetail === 'catalog' ? null : 'catalog')}
+          className={`glass-panel p-5 rounded-xl border text-left cursor-pointer transition-all focus:outline-none ${
+            selectedStatDetail === 'catalog' ? 'border-luxury-gold shadow-gold-500/5 shadow-lg' : 'border-slate-800/80 hover:border-gold-500/30'
+          }`}
+        >
+          <span className="text-[9px] text-slate-500 uppercase tracking-widest block">Vault Catalog</span>
           <h4 className="text-2xl font-serif text-white mt-1">{stats.totalProducts} items</h4>
-        </div>
+          <span className="text-[8px] text-luxury-gold mt-1 block font-semibold">🔍 Click for inventory</span>
+        </button>
       </div>
+
+      {/* Detailed Stat Breakdown Panel */}
+      {selectedStatDetail && (
+        <div className="glass-panel p-6 rounded-xl border border-gold-500/15 text-left animate-fadeIn mt-6">
+          <div className="flex justify-between items-center border-b border-slate-900 pb-3 mb-4">
+            <h3 className="text-sm font-serif text-white uppercase tracking-wider flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-luxury-gold rounded-full" />
+              {selectedStatDetail === 'revenue' && 'Revenue Ledger & Performance'}
+              {selectedStatDetail === 'rentals' && 'Active Rental Schedules'}
+              {selectedStatDetail === 'clients' && 'Registered Client Directory'}
+              {selectedStatDetail === 'catalog' && 'Vault Inventory Summary'}
+            </h3>
+            <button 
+              onClick={() => setSelectedStatDetail(null)}
+              className="text-[10px] text-slate-500 hover:text-white uppercase tracking-widest cursor-pointer"
+            >
+              Close Details ✕
+            </button>
+          </div>
+
+          {/* 1. REVENUE PANEL */}
+          {selectedStatDetail === 'revenue' && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-luxury-charcoal/20 p-4 rounded-lg border border-slate-900">
+                  <span className="text-[10px] text-slate-500 uppercase tracking-wider block">Average Order Value</span>
+                  <span className="text-lg font-serif text-white font-semibold">
+                    ${orders.length > 0 ? Math.round(stats.revenue / orders.length) : 0}
+                  </span>
+                </div>
+                <div className="bg-luxury-charcoal/20 p-4 rounded-lg border border-slate-900">
+                  <span className="text-[10px] text-slate-500 uppercase tracking-wider block">Total Bookings</span>
+                  <span className="text-lg font-serif text-white font-semibold">{orders.length}</span>
+                </div>
+                <div className="bg-luxury-charcoal/20 p-4 rounded-lg border border-slate-900">
+                  <span className="text-[10px] text-slate-500 uppercase tracking-wider block">Active Held Deposits</span>
+                  <span className="text-lg font-serif text-white font-semibold">
+                    ${orders.filter(o => o.status === 'Active').reduce((sum, o) => {
+                      const depositSum = o.items.reduce((s, item) => s + (item.deposit || 400) * (item.qty || 1), 0);
+                      return sum + depositSum;
+                    }, 0)}
+                  </span>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto pt-2">
+                <table className="w-full text-xs text-left text-slate-400">
+                  <thead>
+                    <tr className="border-b border-slate-900 text-slate-500 uppercase tracking-wider font-semibold text-[10px]">
+                      <th className="pb-2">Date</th>
+                      <th className="pb-2">Order ID</th>
+                      <th className="pb-2">Patron Email</th>
+                      <th className="pb-2">Ornaments Rented</th>
+                      <th className="pb-2 text-right">Revenue</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-900/40">
+                    {orders.map((o) => (
+                      <tr key={o.id} className="hover:bg-slate-950/15">
+                        <td className="py-2.5 whitespace-nowrap text-slate-400 font-light">{o.date}</td>
+                        <td className="py-2.5 font-mono font-medium text-white">{o.orderId || o.id.substring(0, 8).toUpperCase()}</td>
+                        <td className="py-2.5 font-light text-slate-400">{o.customerEmail}</td>
+                        <td className="py-2.5 max-w-[200px] truncate font-light text-slate-400" title={o.items.map(i => `${i.name} (x${i.qty || 1})`).join(', ')}>
+                          {o.items.map(i => `${i.name} (x${i.qty || 1})`).join(', ')}
+                        </td>
+                        <td className="py-2.5 text-right text-white font-semibold">${o.total}</td>
+                      </tr>
+                    ))}
+                    {orders.length === 0 && (
+                      <tr>
+                        <td colSpan="5" className="py-4 text-center text-slate-500">No payment records found.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* 2. RENTALS PANEL */}
+          {selectedStatDetail === 'rentals' && (
+            <div className="space-y-4">
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs text-left text-slate-400">
+                  <thead>
+                    <tr className="border-b border-slate-900 text-slate-500 uppercase tracking-wider font-semibold text-[10px]">
+                      <th className="pb-2">Client</th>
+                      <th className="pb-2">Vault Item</th>
+                      <th className="pb-2">Rental Period</th>
+                      <th className="pb-2">Quantity</th>
+                      <th className="pb-2 text-right">Expected Return</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-900/40">
+                    {orders.filter(o => o.status === 'Active').flatMap(o => 
+                      o.items.map((i, idx) => (
+                        <tr key={`${o.id}-${idx}`} className="hover:bg-slate-950/15">
+                          <td className="py-2.5 font-medium text-white">{o.customerName}</td>
+                          <td className="py-2.5 font-light text-slate-400">{i.name}</td>
+                          <td className="py-2.5 text-slate-400 font-light">{i.days || 3} days</td>
+                          <td className="py-2.5 text-slate-400 font-light">{i.qty || 1} units</td>
+                          <td className="py-2.5 text-right text-slate-200 font-medium font-mono">{o.date} (Plc)</td>
+                        </tr>
+                      ))
+                    )}
+                    {orders.filter(o => o.status === 'Active').length === 0 && (
+                      <tr>
+                        <td colSpan="5" className="py-4 text-center text-slate-500">No active rental agreements found.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* 3. CLIENTS PANEL */}
+          {selectedStatDetail === 'clients' && (
+            <div className="space-y-4">
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs text-left text-slate-400">
+                  <thead>
+                    <tr className="border-b border-slate-900 text-slate-500 uppercase tracking-wider font-semibold text-[10px]">
+                      <th className="pb-2">Name</th>
+                      <th className="pb-2">Email</th>
+                      <th className="pb-2">Phone</th>
+                      <th className="pb-2">Address</th>
+                      <th className="pb-2 text-right">Access Level</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-900/40">
+                    {users.map((u) => (
+                      <tr key={u.id} className="hover:bg-slate-950/15">
+                        <td className="py-2.5 font-medium text-white">{u.name}</td>
+                        <td className="py-2.5 font-mono text-slate-300 font-light">{u.email}</td>
+                        <td className="py-2.5 text-slate-400 font-light">{u.phone || 'N/A'}</td>
+                        <td className="py-2.5 max-w-[200px] truncate font-light text-slate-400" title={u.address}>{u.address || 'N/A'}</td>
+                        <td className="py-2.5 text-right">
+                          <span className={`inline-block px-2 py-0.5 rounded text-[9px] font-semibold ${u.hasAdminAccess ? 'bg-gold-950/20 text-luxury-gold border border-gold-500/10' : 'bg-slate-900 text-slate-400 border border-slate-800'}`}>
+                            {u.hasAdminAccess ? 'Administrator' : 'Client Patron'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* 4. CATALOG PANEL */}
+          {selectedStatDetail === 'catalog' && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                
+                {/* Category Inventory counts */}
+                <div className="bg-luxury-charcoal/10 p-4 rounded-xl border border-slate-900">
+                  <h4 className="text-xs uppercase tracking-wider text-luxury-gold font-semibold mb-3 border-b border-slate-900 pb-1.5">Category Breakdown</h4>
+                  <div className="space-y-2 text-xs">
+                    {categories.map((cat) => {
+                      const count = products.filter(p => p.category === cat).length;
+                      return (
+                        <div key={cat} className="flex justify-between text-slate-300 font-light">
+                          <span>{cat}</span>
+                          <span className="font-mono text-white font-semibold">{count} items</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Popular items / Rating highlights */}
+                <div className="bg-luxury-charcoal/10 p-4 rounded-xl border border-slate-900">
+                  <h4 className="text-xs uppercase tracking-wider text-luxury-gold font-semibold mb-3 border-b border-slate-900 pb-1.5">Elite Vault Pieces</h4>
+                  <div className="space-y-3">
+                    {products.slice(0, 3).map((p) => (
+                      <div key={p.id} className="flex items-center gap-3 justify-between text-xs">
+                        <div className="flex items-center gap-2">
+                          <img src={p.image} className="w-8 h-8 rounded object-cover border border-slate-850" alt="" />
+                          <span className="font-medium text-white truncate max-w-[150px]">{p.name}</span>
+                        </div>
+                        <span className="text-luxury-gold font-mono">${p.dailyRent}/day</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Tab Navigation */}
       <div className="flex border-b border-slate-900 overflow-x-auto gap-2 pb-px text-xs uppercase tracking-widest">
