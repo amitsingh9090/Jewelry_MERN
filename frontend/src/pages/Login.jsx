@@ -1,14 +1,24 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useLuxe } from '../context/LuxeContext.jsx';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 function Login() {
   const { login, logout, user, orders, tickets, addTicket, updateUserProfile, adminCredentials, wishlist, products, toggleWishlist, addToCart, returnOrder } = useLuxe();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const typeParam = searchParams.get('type') || 'customer';
   
   // Tab-based login mode: 'customer' or 'admin'
   const [loginType, setLoginType] = useState('customer');
+
+  useEffect(() => {
+    if (typeParam === 'admin') {
+      setLoginType('admin');
+    } else {
+      setLoginType('customer');
+    }
+  }, [typeParam]);
   
   // Customer Login States
   const [emailOrPhone, setEmailOrPhone] = useState('');
@@ -524,32 +534,6 @@ function Login() {
   return (
     <div className="max-w-md mx-auto px-6 py-20 min-h-[60vh] flex flex-col justify-center">
       <div className="glass-panel p-8 rounded-xl border border-gold-500/15 space-y-6">
-        
-        {/* Toggle Tabs */}
-        <div className="flex bg-luxury-dark/60 p-1.5 rounded-lg border border-slate-800">
-          <button
-            type="button"
-            onClick={() => setLoginType('customer')}
-            className={`flex-1 py-1.5 text-xs font-semibold uppercase tracking-wider rounded transition-all cursor-pointer ${
-              loginType === 'customer'
-                ? 'bg-gold-500 text-luxury-black font-bold shadow-md'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Customer Login
-          </button>
-          <button
-            type="button"
-            onClick={() => setLoginType('admin')}
-            className={`flex-1 py-1.5 text-xs font-semibold uppercase tracking-wider rounded transition-all cursor-pointer ${
-              loginType === 'admin'
-                ? 'bg-gold-500 text-luxury-black font-bold shadow-md'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Admin Login
-          </button>
-        </div>
 
         <div className="text-center">
           <h1 className="text-2xl font-serif text-white">
