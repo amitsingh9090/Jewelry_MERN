@@ -259,7 +259,7 @@ function AdminDashboard() {
               <input 
                 type="text" 
                 required 
-                placeholder="e.g. amit9115"
+                placeholder="enter the admin id"
                 value={adminIdInput} 
                 onChange={(e) => setAdminIdInput(e.target.value)} 
                 className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2.5 text-xs text-slate-200 focus:outline-none focus:border-gold-500" 
@@ -270,7 +270,7 @@ function AdminDashboard() {
               <input 
                 type="password" 
                 required 
-                placeholder="•••••"
+                placeholder="enter the access password"
                 value={adminPasswordInput} 
                 onChange={(e) => setAdminPasswordInput(e.target.value)} 
                 className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2.5 text-xs text-slate-200 focus:outline-none focus:border-gold-500" 
