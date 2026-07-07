@@ -61,7 +61,7 @@ function Register() {
             <input 
               type="text" 
               required 
-              placeholder="Amit Singh"
+              placeholder="enter the name"
               value={name} 
               onChange={(e) => setName(e.target.value)} 
               className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2.5 text-xs text-slate-200 focus:outline-none focus:border-gold-500 transition-colors" 
@@ -73,7 +73,7 @@ function Register() {
             <input 
               type="email" 
               required 
-              placeholder="amit@example.com"
+              placeholder="enter the email address"
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
               className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2.5 text-xs text-slate-200 focus:outline-none focus:border-gold-500 transition-colors" 
@@ -85,7 +85,7 @@ function Register() {
             <input 
               type="tel" 
               required 
-              placeholder="+91 98765 43210"
+              placeholder="enter the phone contact"
               value={phone} 
               onChange={(e) => setPhone(e.target.value)} 
               className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2.5 text-xs text-slate-200 focus:outline-none focus:border-gold-500 transition-colors" 
@@ -96,7 +96,7 @@ function Register() {
             <label className="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">Shipping Address</label>
             <textarea 
               required 
-              placeholder="Enter your shipping address for secure transit delivery..."
+              placeholder="enter the shipping address"
               value={address} 
               onChange={(e) => setAddress(e.target.value)} 
               rows="2"
@@ -110,7 +110,7 @@ function Register() {
               <input 
                 type="password" 
                 required 
-                placeholder="••••••"
+                placeholder="enter the password"
                 value={password} 
                 onChange={(e) => setPassword(e.target.value)} 
                 className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2.5 text-xs text-slate-200 focus:outline-none focus:border-gold-500 transition-colors" 
@@ -121,7 +121,7 @@ function Register() {
               <input 
                 type="password" 
                 required 
-                placeholder="••••••"
+                placeholder="enter the confirm password"
                 value={confirmPassword} 
                 onChange={(e) => setConfirmPassword(e.target.value)} 
                 className="w-full bg-luxury-charcoal border border-slate-800 rounded p-2.5 text-xs text-slate-200 focus:outline-none focus:border-gold-500 transition-colors" 
